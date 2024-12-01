@@ -25,6 +25,8 @@ import com.abeltran10.carajilloapp.databinding.FragmentLoginBinding;
 
 import com.abeltran10.carajilloapp.R;
 
+import com.abeltran10.carajilloapp.ui.main.MainFragment;
+
 public class LoginFragment extends Fragment {
 
     private LoginViewModel loginViewModel;
@@ -129,7 +131,9 @@ public class LoginFragment extends Fragment {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
         // TODO : initiate successful logged in experience
         if (getContext() != null && getContext().getApplicationContext() != null) {
-            Toast.makeText(getContext().getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
+            requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
+                    .add(R.id.fragment_main, MainFragment.class, null)
+                    .commit();
         }
     }
 
