@@ -12,7 +12,7 @@ De moment està l'esquelet de la app.
 
 El carajillo de Castelló sap a 'Gloria' amb el fred
 
-Descobrix pas a pas la recepta del tradicional cigaló de Castelló 
+Descobrix pas a pas la recepta del tradicional carajillo de Castelló 
 
 El tradicional ‘cremaet’ de Castelló és el gran aliat en estos dies de molt de fred. Hem de remuntar-nos a la fi del s. XIX, a la Guerra de la Independència de Cuba, per a conéixer el seu origen. Durant la invasió de les tropes espanyoles, en escassejar les provisions, els soldats van haver de proveir-se dels productes autòctons, entre els quals es trobaven el café i el rom. La mescla de tots dos els donava coratge, al que la frase comuna era «agafarem *corajillo» abans d'entrar en combat. D'ací es va obtindre el resultat, *corajillo-carajillo.
 
