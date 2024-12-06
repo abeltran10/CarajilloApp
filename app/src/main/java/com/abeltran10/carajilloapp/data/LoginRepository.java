@@ -2,6 +2,30 @@ package com.abeltran10.carajilloapp.data;
 
 import com.abeltran10.carajilloapp.data.model.LoggedInUser;
 
+import com.abeltran10.carajilloapp.utils.Cypher;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+
 /**
  * Class that requests authentication and user information from the remote data source and
  * maintains an in-memory cache of login status and user credentials information.
@@ -9,21 +33,19 @@ import com.abeltran10.carajilloapp.data.model.LoggedInUser;
 public class LoginRepository {
 
     private static volatile LoginRepository instance;
-
-    private LoginDataSource dataSource;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     // If user credentials will be cached in local storage, it is recommended it be encrypted
     // @see https://developer.android.com/training/articles/keystore
     private LoggedInUser user = null;
 
     // private constructor : singleton access
-    private LoginRepository(LoginDataSource dataSource) {
-        this.dataSource = dataSource;
+    private LoginRepository() {
     }
 
-    public static LoginRepository getInstance(LoginDataSource dataSource) {
+    public static LoginRepository getInstance() {
         if (instance == null) {
-            instance = new LoginRepository(dataSource);
+            instance = new LoginRepository();
         }
         return instance;
     }
@@ -34,21 +56,65 @@ public class LoginRepository {
 
     public void logout() {
         user = null;
-        dataSource.logout();
     }
 
     private void setLoggedInUser(LoggedInUser user) {
         this.user = user;
-        // If user credentials will be cached in local storage, it is recommended it be encrypted
-        // @see https://developer.android.com/training/articles/keystore
     }
 
-    public Result<LoggedInUser> login(String username, String password) {
-        // handle login
-        Result<LoggedInUser> result = dataSource.login(username, password);
-        if (result instanceof Result.Success) {
-            setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
+    public Result<LoggedInUser> login(String email, String password) {
+
+        Result<LoggedInUser> result = null;
+        LoggedInUser loggedInUser = null;
+
+        Task<QuerySnapshot> queryDocumentSnapshotTask = db.collection("users")
+                .whereEqualTo("email", email)
+                .get();
+
+        try {
+            QuerySnapshot querySnapshot = Tasks.await(queryDocumentSnapshotTask);
+            for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
+                loggedInUser = new LoggedInUser();
+                loggedInUser.setId(documentSnapshot.getId());
+                loggedInUser.setEmail(documentSnapshot.getString("email"));
+                loggedInUser.setPassword(documentSnapshot.getString("password"));
+                loggedInUser.setUsername(documentSnapshot.getString("username"));
+
+            }
+
+            if (loggedInUser != null) {
+                setLoggedInUser(loggedInUser);
+
+                String decrypted = Cypher.decrypt(user.getPassword());
+
+                 if (password.equals(decrypted)) {
+                     result = new Result.Success<LoggedInUser>(user);
+                 } else {
+                     result = new Result.Error(new Exception("Usuario o contraseña incorrectos"));
+                 }
+
+            } else {
+                result = new Result.Error(new Exception("Usuario o contraseña incorrectos"));
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
+
         return result;
     }
+
+    public void asyncLogin(String email, String password, RepositoryCallback<LoggedInUser> callback) {
+        Runnable runnable = () -> {
+            try {
+                Result<LoggedInUser> result = login(email, password);
+                callback.onComplete(result);
+            } catch (Exception e) {
+                Result<LoggedInUser> errorResult = new Result.Error(new IOException("Error al recuperar el usuario"));
+                callback.onComplete(errorResult);
+            }
+        };
+
+        new Thread(runnable).start();
+    }
+
 }

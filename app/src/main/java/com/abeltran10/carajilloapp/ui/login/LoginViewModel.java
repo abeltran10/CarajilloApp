@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import android.util.Patterns;
 
 import com.abeltran10.carajilloapp.data.LoginRepository;
+import com.abeltran10.carajilloapp.data.RepositoryCallback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.LoggedInUser;
 import com.abeltran10.carajilloapp.R;
@@ -31,14 +32,15 @@ public class LoginViewModel extends ViewModel {
 
     public void login(String username, String password) {
         // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.login(username, password);
 
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-        } else {
-            loginResult.setValue(new LoginResult(R.string.login_failed));
-        }
+        loginRepository.asyncLogin(username, password, result -> {
+            if (result instanceof Result.Success) {
+                LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
+                loginResult.postValue(new LoginResult(new LoggedInUserView(data.getUsername())));
+            } else {
+                loginResult.postValue(new LoginResult(R.string.login_failed));
+            }
+        });
     }
 
     public void loginDataChanged(String username, String password) {
@@ -65,6 +67,6 @@ public class LoginViewModel extends ViewModel {
 
     // A placeholder password validation check
     private boolean isPasswordValid(String password) {
-        return password != null && password.trim().length() > 5;
+        return password != null && password.trim().length() >= 4;
     }
 }
