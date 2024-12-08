@@ -1,15 +1,15 @@
 package com.abeltran10.carajilloapp.ui.login;
 
+import android.util.Patterns;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import android.util.Patterns;
-
-import com.abeltran10.carajilloapp.data.repo.LoginRepository;
+import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.LoggedInUser;
-import com.abeltran10.carajilloapp.R;
+import com.abeltran10.carajilloapp.data.repo.LoginRepository;
 
 public class LoginViewModel extends ViewModel {
 

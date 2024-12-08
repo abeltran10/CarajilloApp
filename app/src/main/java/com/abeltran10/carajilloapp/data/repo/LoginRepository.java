@@ -3,8 +3,7 @@ package com.abeltran10.carajilloapp.data.repo;
 import com.abeltran10.carajilloapp.data.RepositoryCallback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.LoggedInUser;
-
-import com.abeltran10.carajilloapp.utils.Cypher;
+import com.abeltran10.carajilloapp.utils.Cipher;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -75,7 +74,7 @@ public class LoginRepository {
             if (loggedInUser != null) {
                 setLoggedInUser(loggedInUser);
 
-                String decrypted = Cypher.decrypt(user.getPassword());
+                String decrypted = Cipher.decrypt(user.getPassword());
 
                  if (password.equals(decrypted)) {
                      result = new Result.Success<LoggedInUser>(user);
