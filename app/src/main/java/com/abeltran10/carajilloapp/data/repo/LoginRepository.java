@@ -1,5 +1,7 @@
-package com.abeltran10.carajilloapp.data;
+package com.abeltran10.carajilloapp.data.repo;
 
+import com.abeltran10.carajilloapp.data.RepositoryCallback;
+import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.LoggedInUser;
 
 import com.abeltran10.carajilloapp.utils.Cypher;
@@ -7,7 +9,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Source;
 

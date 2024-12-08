@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 
-import com.abeltran10.carajilloapp.data.LoginRepository;
+import com.abeltran10.carajilloapp.data.repo.LoginRepository;
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.
