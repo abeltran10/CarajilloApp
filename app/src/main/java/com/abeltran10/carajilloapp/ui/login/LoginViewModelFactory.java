@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.abeltran10.carajilloapp.data.repo.LoginRepository;
+import com.abeltran10.carajilloapp.data.repo.UserRepository;
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.
@@ -17,7 +17,7 @@ public class LoginViewModelFactory implements ViewModelProvider.Factory {
     @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(LoginViewModel.class)) {
-            return (T) new LoginViewModel(LoginRepository.getInstance());
+            return (T) new LoginViewModel(UserRepository.getInstance());
         } else {
             throw new IllegalArgumentException("Unknown ViewModel class");
         }

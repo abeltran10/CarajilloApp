@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.databinding.FragmentLoginBinding;
 import com.abeltran10.carajilloapp.ui.main.MainFragment;
+import com.abeltran10.carajilloapp.ui.register.RegisterFragment;
 
 public class LoginFragment extends Fragment {
 
@@ -48,6 +49,7 @@ public class LoginFragment extends Fragment {
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
+        final Button registerButton = binding.register;
 
         loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
             @Override
@@ -107,6 +109,17 @@ public class LoginFragment extends Fragment {
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 loginViewModel.login(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
+            }
+        });
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getContext() != null && getContext().getApplicationContext() != null) {
+                    requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
+                            .replace(R.id.frame_container, RegisterFragment.class, null)
+                            .commit();
+                }
             }
         });
     }
