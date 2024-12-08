@@ -11,10 +11,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.abeltran10.carajilloapp.R;
+import com.abeltran10.carajilloapp.databinding.FragmentLoginBinding;
+import com.abeltran10.carajilloapp.databinding.FragmentRegisterBinding;
+import com.abeltran10.carajilloapp.ui.login.LoginViewModel;
+import com.abeltran10.carajilloapp.ui.login.LoginViewModelFactory;
 
 public class RegisterFragment extends Fragment {
 
-    private RegisterViewModel mViewModel;
+    private RegisterViewModel registerViewModel;
+    private FragmentRegisterBinding binding;
 
     public static RegisterFragment newInstance() {
         return new RegisterFragment();
@@ -23,14 +28,15 @@ public class RegisterFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_register, container, false);
+        binding = FragmentRegisterBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
-        // TODO: Use the ViewModel
-    }
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        registerViewModel = new ViewModelProvider(this, new RegisterViewModelFactory())
+                .get(RegisterViewModel.class);
+    }
 }
