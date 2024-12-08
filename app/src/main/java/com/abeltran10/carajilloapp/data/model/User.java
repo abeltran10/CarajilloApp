@@ -3,7 +3,7 @@ package com.abeltran10.carajilloapp.data.model;
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository
  */
-public class LoggedInUser {
+public class User {
 
     private String id;
     private String username;
@@ -12,10 +12,10 @@ public class LoggedInUser {
 
     private String password;
 
-    public LoggedInUser() {
+    public User() {
     }
 
-    public LoggedInUser(String id, String username, String email, String password) {
+    public User(String id, String username, String email, String password) {
         this.id = id;
         this.username = username;
         this.email = email;
