@@ -7,24 +7,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
+import com.google.firebase.firestore.Source;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Security;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -67,9 +55,10 @@ public class LoginRepository {
         Result<LoggedInUser> result = null;
         LoggedInUser loggedInUser = null;
 
+
         Task<QuerySnapshot> queryDocumentSnapshotTask = db.collection("users")
                 .whereEqualTo("email", email)
-                .get();
+                .get(Source.SERVER);
 
         try {
             QuerySnapshot querySnapshot = Tasks.await(queryDocumentSnapshotTask);

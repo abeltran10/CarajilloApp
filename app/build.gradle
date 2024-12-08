@@ -27,6 +27,9 @@ android {
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
         buildConfigField "String", "SECRETKEY", "\"" + properties.getProperty('secretkey') + "\""
         buildConfigField "String", "INITVECTOR", "\"" + properties.getProperty('initvector') + "\""
+        buildConfigField "String", "FIREBASE_DATABASE", "\"" + properties.getProperty('firebase.database') + "\""
+        buildConfigField "String", "FIREBASE_APIKEY", "\"" + properties.getProperty('firebase.apikey') + "\""
+        buildConfigField "String", "FIREBASE_PROJECTID", "\"" + properties.getProperty('firebase.projectid') + "\""
 
     }
 
