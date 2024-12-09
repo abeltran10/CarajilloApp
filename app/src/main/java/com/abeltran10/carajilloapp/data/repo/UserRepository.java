@@ -124,6 +124,7 @@ public class UserRepository {
             if (!querySnapshot.getDocuments().isEmpty())
                 result = new Result.Error(new Exception("El usuario ya existe"));
             else {
+                user = new User();
                 user.setEmail(email);
                 user.setPassword(Cipher.encrypt(password));
                 user.setUsername(username);
