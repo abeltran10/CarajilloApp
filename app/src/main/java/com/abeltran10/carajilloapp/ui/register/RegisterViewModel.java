@@ -1,5 +1,8 @@
 package com.abeltran10.carajilloapp.ui.register;
 
+import android.util.Patterns;
+
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -13,8 +16,18 @@ public class RegisterViewModel extends ViewModel {
     private MutableLiveData<RegisterResult> registerResult = new MutableLiveData<>();
     private UserRepository userRepository;
 
+    private MutableLiveData<RegisterFormState> registerFormState = new MutableLiveData<>();
+
     public RegisterViewModel(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    LiveData<RegisterFormState> getRegisterFormState() {
+        return registerFormState;
+    }
+
+    LiveData<RegisterResult> getRegisterResult() {
+        return registerResult;
     }
 
     public void create(String username, String email, String password) {
@@ -29,5 +42,44 @@ public class RegisterViewModel extends ViewModel {
             }
         });
     }
-    // TODO: Implement the ViewModel
+
+    public void loginDataChanged(String username, String email, String password, String repeatPassword) {
+        if (!isUserNameValid(username)) {
+            registerFormState.setValue(new RegisterFormState(R.string.invalid_username, null, null));
+        } else if (!isPasswordValid(password, repeatPassword)) {
+            registerFormState.setValue(new RegisterFormState(null, null, R.string.invalid_password));
+        } else if (!isEmailValid(email)) {
+            registerFormState.setValue(new RegisterFormState(null, R.string.invalid_email, null));
+        } else {
+            registerFormState.setValue(new RegisterFormState(true));
+        }
+    }
+
+    // A placeholder username validation check
+    private boolean isUserNameValid(String username) {
+        if (username == null) {
+            return false;
+        }
+
+        return username.length() >= 4 && !username.trim().isEmpty();
+    }
+
+    private boolean isEmailValid(String email) {
+        if (email == null) {
+            return false;
+        }
+        if (email.contains("@")) {
+            return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        } else {
+            return !email.trim().isEmpty();
+        }
+    }
+
+    // A placeholder password validation check
+    private boolean isPasswordValid(String password, String repeatPassword) {
+        boolean passwordValid = password != null && password.trim().length() >= 4;
+        boolean passwordMatch = password.equals(repeatPassword);
+
+        return passwordValid && passwordMatch;
+    }
 }
