@@ -68,6 +68,9 @@ public class RegisterFragment extends Fragment {
                 if (registerFormState.getPasswordError() != null) {
                     passwordEditText.setError(getString(registerFormState.getPasswordError()));
                 }
+                if (registerFormState.getRepeatpasswordError() != null) {
+                    repeatpasswordEditText.setError(getString(registerFormState.getRepeatpasswordError()));
+                }
             }
         });
 

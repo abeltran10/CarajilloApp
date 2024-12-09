@@ -45,14 +45,20 @@ public class RegisterViewModel extends ViewModel {
 
     public void loginDataChanged(String username, String email, String password, String repeatPassword) {
         if (!isUserNameValid(username)) {
-            registerFormState.setValue(new RegisterFormState(R.string.invalid_username, null, null));
-        } else if (!isPasswordValid(password, repeatPassword)) {
-            registerFormState.setValue(new RegisterFormState(null, null, R.string.invalid_password));
+            registerFormState.setValue(new RegisterFormState(R.string.invalid_username, null, null, null));
+        } else if (!isPasswordValid(password)) {
+            registerFormState.setValue(new RegisterFormState(null, null, R.string.invalid_password, null));
+        } else if (!isRepeatPasswordValid(password, repeatPassword)) {
+            registerFormState.setValue(new RegisterFormState(null, null, null, R.string.invalid_repeated_password));
         } else if (!isEmailValid(email)) {
-            registerFormState.setValue(new RegisterFormState(null, R.string.invalid_email, null));
+            registerFormState.setValue(new RegisterFormState(null, R.string.invalid_email, null, null));
         } else {
             registerFormState.setValue(new RegisterFormState(true));
         }
+    }
+
+    private boolean isRepeatPasswordValid(String password, String repeatPassword) {
+        return repeatPassword.equals(password);
     }
 
     // A placeholder username validation check
@@ -76,10 +82,8 @@ public class RegisterViewModel extends ViewModel {
     }
 
     // A placeholder password validation check
-    private boolean isPasswordValid(String password, String repeatPassword) {
-        boolean passwordValid = password != null && password.trim().length() >= 4;
-        boolean passwordMatch = password.equals(repeatPassword);
+    private boolean isPasswordValid(String password) {
+        return password != null && password.trim().length() >= 4;
 
-        return passwordValid && passwordMatch;
     }
 }
