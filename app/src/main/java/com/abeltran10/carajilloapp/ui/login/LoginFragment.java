@@ -118,6 +118,7 @@ public class LoginFragment extends Fragment {
                 if (getContext() != null && getContext().getApplicationContext() != null) {
                     requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
                             .replace(R.id.frame_container, RegisterFragment.class, null)
+                            .addToBackStack("login")
                             .commit();
                 }
             }
