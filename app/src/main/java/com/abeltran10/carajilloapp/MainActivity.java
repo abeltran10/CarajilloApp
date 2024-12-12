@@ -7,15 +7,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.abeltran10.carajilloapp.ui.login.LoginFragment;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Objects;
 
-    public MainActivity() {
-        super(R.layout.activity_main);
-    }
+public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+
+        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.mipmap.ic_launcher_round);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (savedInstanceState == null)
             getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
