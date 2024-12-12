@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.CarajilloApp" parent="Theme.MaterialComponents.Light.DarkActionBar" />
+    <style name="Theme.CarajilloApp" parent="Theme.AppCompat.NoActionBar">
+
+    </style>
 
 </resources>
