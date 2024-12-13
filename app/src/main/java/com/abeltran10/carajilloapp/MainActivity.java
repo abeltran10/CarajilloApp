@@ -13,7 +13,6 @@ import com.abeltran10.carajilloapp.ui.login.LoginFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    @SuppressLint("UseSupportActionBar")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setLogo(R.mipmap.ic_launcher_round);
+        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
 
         if (savedInstanceState == null)
             getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
