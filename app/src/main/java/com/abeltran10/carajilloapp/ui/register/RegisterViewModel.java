@@ -38,7 +38,7 @@ public class RegisterViewModel extends ViewModel {
                 User data = ((Result.Success<User>) result).getData();
                 registerResult.postValue(new RegisterResult(new RegisterView(data.getUsername())));
             } else {
-                registerResult.postValue(new RegisterResult(R.string.register_failed));
+                registerResult.postValue(new RegisterResult(((Result.Error)result).getError().getMessage()));
             }
         });
     }

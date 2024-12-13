@@ -6,13 +6,13 @@ public class RegisterResult {
     @Nullable
     private RegisterView success;
     @Nullable
-    private Integer error;
+    private String error;
 
     RegisterResult(RegisterView success) {
         this.success = success;
     }
 
-    RegisterResult(@Nullable Integer error) {
+    RegisterResult(@Nullable String error) {
         this.error = error;
     }
 
@@ -22,7 +22,7 @@ public class RegisterResult {
     }
 
     @Nullable
-    Integer getError() {
+    String getError() {
         return error;
     }
 }

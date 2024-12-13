@@ -6,6 +6,10 @@ import com.abeltran10.carajilloapp.data.model.User;
 import com.abeltran10.carajilloapp.utils.Cipher;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
@@ -23,10 +27,8 @@ import java.util.concurrent.ExecutionException;
 public class UserRepository {
 
     private static volatile UserRepository instance;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-    // If user credentials will be cached in local storage, it is recommended it be encrypted
-    // @see https://developer.android.com/training/articles/keystore
     private User user = null;
 
     // private constructor : singleton access
@@ -58,37 +60,24 @@ public class UserRepository {
         User user = null;
 
 
-        Task<QuerySnapshot> queryDocumentSnapshotTask = db.collection("users")
-                .whereEqualTo("email", email)
-                .get(Source.SERVER);
-
         try {
-            QuerySnapshot querySnapshot = Tasks.await(queryDocumentSnapshotTask);
-            for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
+            AuthResult authResult = Tasks.await(mAuth.signInWithEmailAndPassword(email, password));
+            if (authResult.getUser() != null) {
+                FirebaseUser firebaseUser = mAuth.getCurrentUser();
+
                 user = new User();
-                user.setId(documentSnapshot.getId());
-                user.setEmail(documentSnapshot.getString("email"));
-                user.setPassword(documentSnapshot.getString("password"));
-                user.setUsername(documentSnapshot.getString("username"));
+                user.setId(firebaseUser.getUid());
+                user.setEmail(firebaseUser.getEmail());
+                user.setUsername(firebaseUser.getDisplayName());
 
-            }
-
-            if (user != null) {
                 setUser(user);
-
-                String decrypted = Cipher.decrypt(this.user.getPassword());
-
-                 if (password.equals(decrypted)) {
-                     result = new Result.Success<User>(this.user);
-                 } else {
-                     result = new Result.Error(new Exception("Usuario o contraseña incorrectos"));
-                 }
-
+                result = new Result.Success<User>(this.user);
             } else {
-                result = new Result.Error(new Exception("Usuario o contraseña incorrectos"));
+                result = new Result.Error(new Exception("Email o password incorrectes"));
             }
+
         } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+            result = new Result.Error(new Exception("Email o password incorrectes"));
         }
 
         return result;
@@ -100,7 +89,7 @@ public class UserRepository {
                 Result<User> result = login(email, password);
                 callback.onComplete(result);
             } catch (Exception e) {
-                Result<User> errorResult = new Result.Error(new IOException("Error al recuperar el usuario"));
+                Result<User> errorResult = new Result.Error(new IOException("Error al recuperar l'usuari"));
                 callback.onComplete(errorResult);
             }
         };
@@ -113,34 +102,28 @@ public class UserRepository {
         Result<User> result = null;
         User user = null;
 
-
-        Task<QuerySnapshot> queryDocumentSnapshotTask = db.collection("users")
-                .where(Filter.or(Filter.equalTo("username", username), Filter.equalTo("email", email)))
-                .get(Source.SERVER);
-
         try {
-            QuerySnapshot querySnapshot = Tasks.await(queryDocumentSnapshotTask);
+            AuthResult authResult = Tasks.await(mAuth.createUserWithEmailAndPassword(email, password));
+            if (authResult.getUser() != null) {
+                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                        .setDisplayName(username)
+                        .build();
+                Tasks.await(authResult.getUser().updateProfile(profileUpdates));
+                FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
-            if (!querySnapshot.getDocuments().isEmpty())
-                result = new Result.Error(new Exception("El usuario ya existe"));
-            else {
                 user = new User();
-                user.setEmail(email);
-                user.setPassword(Cipher.encrypt(password));
-                user.setUsername(username);
+                user.setId(firebaseUser.getUid());
+                user.setEmail(firebaseUser.getEmail());
+                user.setUsername(firebaseUser.getDisplayName());
 
-                DocumentReference documentReference = Tasks.await(db.collection("users").add(user));
-
-                if (documentReference.getId() != null && !documentReference.getId().isEmpty()) {
-                    user.setId(documentReference.getId());
-                    setUser(user);
-
-                    result = new Result.Success<User>(this.user);
-                }
+                setUser(user);
+                result = new Result.Success<User>(this.user);
+            } else {
+                result = new Result.Error(new Exception("Error al crear el compte"));
             }
 
         } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+            result = new Result.Error(new Exception("El email ja està registrat"));
         }
 
         return result;
@@ -152,7 +135,7 @@ public class UserRepository {
                 Result<User> result = create(username, email, password);
                 callback.onComplete(result);
             } catch (Exception e) {
-                Result<User> errorResult = new Result.Error(new IOException("Error al crear el usuario"));
+                Result<User> errorResult = new Result.Error(new IOException("Error al crear el compte"));
                 callback.onComplete(errorResult);
             }
         };

@@ -135,7 +135,7 @@ public class RegisterFragment extends Fragment {
         }
     }
 
-    private void showRegisterFailed(Integer errorString) {
+    private void showRegisterFailed(String errorString) {
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(
                     getContext().getApplicationContext(),
