@@ -13,6 +13,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Hello" />
+        android:paddingTop="?attr/actionBarSize"
+        android:text="@string/welcome"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
