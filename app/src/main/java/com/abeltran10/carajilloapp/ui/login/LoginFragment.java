@@ -1,31 +1,27 @@
 package com.abeltran10.carajilloapp.ui.login;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
-
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.abeltran10.carajilloapp.databinding.FragmentLoginBinding;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.abeltran10.carajilloapp.R;
-
+import com.abeltran10.carajilloapp.databinding.FragmentLoginBinding;
 import com.abeltran10.carajilloapp.ui.main.MainFragment;
+import com.abeltran10.carajilloapp.ui.register.RegisterFragment;
 
 public class LoginFragment extends Fragment {
 
@@ -53,11 +49,11 @@ public class LoginFragment extends Fragment {
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
+        final Button registerButton = binding.register;
 
         loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
             @Override
-            public void onChanged(@Nullable LoginFormState loginFormState) {
-                if (loginFormState == null) {
+            public void onChanged(@Nullable LoginFormState loginFormState) {if (loginFormState == null) {
                     return;
                 }
                 loginButton.setEnabled(loginFormState.isDataValid());
@@ -103,19 +99,9 @@ public class LoginFragment extends Fragment {
                         passwordEditText.getText().toString());
             }
         };
+
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
-        passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
-                            passwordEditText.getText().toString());
-                }
-                return false;
-            }
-        });
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,6 +111,18 @@ public class LoginFragment extends Fragment {
                         passwordEditText.getText().toString());
             }
         });
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getContext() != null && getContext().getApplicationContext() != null) {
+                    requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
+                            .replace(R.id.frame_container, RegisterFragment.class, null)
+                            .addToBackStack("login")
+                            .commit();
+                }
+            }
+        });
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
@@ -132,12 +130,12 @@ public class LoginFragment extends Fragment {
         // TODO : initiate successful logged in experience
         if (getContext() != null && getContext().getApplicationContext() != null) {
             requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
-                    .add(R.id.fragment_main, MainFragment.class, null)
+                    .replace(R.id.frame_container, MainFragment.class, null)
                     .commit();
         }
     }
 
-    private void showLoginFailed(@StringRes Integer errorString) {
+    private void showLoginFailed(String errorString) {
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(
                     getContext().getApplicationContext(),

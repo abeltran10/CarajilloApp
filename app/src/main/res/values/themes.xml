@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.CarajilloApp" parent="Theme.AppCompat.Light" />
+    <style name="Theme.CarajilloApp" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorAccent">@color/grey</item>
+        <item name="colorPrimaryDark">@color/black</item>
+    </style>
+
 </resources>

@@ -3,10 +3,16 @@
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome!"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
+    <string name="prompt_repeat_password">Repetix password</string>
+    <string name="prompt_register_username">Nom usuari</string>
+    <string name="action_sign_in">Iniciar sessió</string>
+    <string name="action_register">Crear compte</string>
+    <string name="action_sign_in_short">Iniciar sessió</string>
+    <string name="welcome">"Benvingut!"</string>
+    <string name="invalid_username">El nom d\'usuari no és vàlid</string>
+    <string name="invalid_password">La password ha de tenir almenys 4 caràcters</string>
+    <string name="invalid_repeated_password">La password repetido no coincidèix</string>
+    <string name="invalid_email">No és un email vàlid</string>
+    <string name="login_failed">"L'inici de sessió ha fallat"</string>
+    <string name="register_failed">"La creació del compte ha fallat"</string>
 </resources>

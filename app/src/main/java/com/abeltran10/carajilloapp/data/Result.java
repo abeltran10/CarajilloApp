@@ -44,5 +44,9 @@ public class Result<T> {
         public Exception getError() {
             return this.error;
         }
+
+        public void setError(Exception error) {
+            this.error = error;
+        }
     }
 }
