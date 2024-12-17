@@ -4,9 +4,9 @@
 
 CarajilloApp és una app per Android on els usuaris poden: crear un compte, iniciar sesió, insertar un bar i puntuar el seu carajillo. S'utilitza una bases de dades al nuvol amb Firebase.
 
-## LLançaments
+## Llançaments
 
-De moment està l'esquelet de la app.
+- beta-v1.0 (https://github.com/abeltran10/CarajilloApp/releases/tag/beta-v1.0)
 
 ## Què és un carajillo?
 
@@ -18,3 +18,11 @@ El tradicional ‘cremaet’ de Castelló és el gran aliat en estos dies de mol
 
 ‪
 I és que com els cigalons de la nostra província, cap, perquè ningú com els castellonencs seguixen un protocol tan exhaustiu i elaborat de preparació: cremar delicadament el rom juntament amb dos grans de café, canyella en brut, sucre, un trosset de pell de llima i molt carinyo. Només seguint estos passos s'obtenen els tres nivells diferenciats del ‘cremaet’: la crema o l'espuma a dalt, el café en el mig i el rom a baix.
+
+## Demo
+
+Demo beta-v1.0 (https://github.com/abeltran10/CarajilloApp/releases/tag/beta-v1.0)
+
+[CarajilloApp-betav1.0.webm](https://github.com/user-attachments/assets/5dc73059-b40c-46a3-9a38-501724c25c3b)
+
+
