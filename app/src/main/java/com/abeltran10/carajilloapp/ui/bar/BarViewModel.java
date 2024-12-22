@@ -7,9 +7,7 @@ import androidx.lifecycle.ViewModel;
 import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
-import com.abeltran10.carajilloapp.data.model.User;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
-import com.abeltran10.carajilloapp.ui.register.RegisterFormState;
 
 public class BarViewModel extends ViewModel {
 

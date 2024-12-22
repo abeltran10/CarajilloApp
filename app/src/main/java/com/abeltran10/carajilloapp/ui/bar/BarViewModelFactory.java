@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
-import com.abeltran10.carajilloapp.ui.login.LoginViewModel;
 
 public class BarViewModelFactory implements ViewModelProvider.Factory {
 
