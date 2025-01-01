@@ -13,11 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abeltran10.carajilloapp.R;
-import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.databinding.FragmentMainBinding;
-import com.abeltran10.carajilloapp.ui.login.LoginViewModel;
-import com.abeltran10.carajilloapp.ui.login.LoginViewModelFactory;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.abeltran10.carajilloapp.ui.bar.BarFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainFragment extends Fragment {
 
@@ -26,6 +24,8 @@ public class MainFragment extends Fragment {
     private MainViewModel mainViewModel;
 
     private MainAdapter mainAdapter;
+
+
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -38,8 +38,9 @@ public class MainFragment extends Fragment {
         mainViewModel = new ViewModelProvider(this, new MainViewModelFactory())
                 .get(MainViewModel.class);
 
-        FirestoreRecyclerOptions<Bar> options = mainViewModel.getBars();
-        mainAdapter = new MainAdapter(options);
+
+        mainViewModel.loadBarOptions();
+        mainAdapter = new MainAdapter(mainViewModel.getOptions());
     }
 
 
@@ -58,6 +59,16 @@ public class MainFragment extends Fragment {
         RecyclerView recyclerView = binding.listView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mainAdapter);
+
+        FloatingActionButton fab = binding.floatingButton;
+        fab.setOnClickListener(view1 -> {
+            if (getContext() != null && getContext().getApplicationContext() != null) {
+                requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
+                        .replace(R.id.frame_container, BarFragment.class, null)
+                        .addToBackStack("main")
+                        .commit();
+            }
+        });
 
     }
 

@@ -1,17 +1,12 @@
 package com.abeltran10.carajilloapp;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.abeltran10.carajilloapp.ui.login.LoginFragment;
-import com.abeltran10.carajilloapp.ui.login.LoginViewModel;
-import com.abeltran10.carajilloapp.ui.login.LoginViewModelFactory;
 import com.abeltran10.carajilloapp.ui.main.MainFragment;
 import com.google.firebase.auth.FirebaseAuth;
 

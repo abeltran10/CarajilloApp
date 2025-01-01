@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.model.Bar;
-
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
@@ -27,6 +26,7 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
     public MainAdapter(@NonNull FirestoreRecyclerOptions<Bar> options) {
         super(options);
     }
+
 
     /**
      * Provide a reference to the type of views that you are using
@@ -74,9 +74,19 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
     @SuppressLint("SetTextI18n")
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder viewHolder, int position, @NonNull Bar bar) {
-        viewHolder.getRestaurantName().setText(bar.getName());
-        viewHolder.getRestaurantLocation().setText(bar.getCity() + " " + bar.getAddress() + " (" + bar.getPostalCode() + ")");
+        viewHolder.getRestaurantName().setText(bar.getName().toUpperCase());
+        viewHolder.getRestaurantLocation().setText(bar.getCity().toUpperCase() + " - " + bar.getAddress().toUpperCase() + " (" + bar.getPostalCode() + ")");
         viewHolder.getRating().setRating(bar.getRating().floatValue());
     }
 
+    @NonNull
+    @Override
+    public Bar getItem(int position) {
+        return super.getItem(position);
+    }
+
+    @Override
+    public int getItemCount() {
+        return super.getItemCount();
+    }
 }

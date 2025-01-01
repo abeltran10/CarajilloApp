@@ -103,7 +103,7 @@ public class RegisterFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                registerViewModel.loginDataChanged(usernameEditText.getText().toString(),
+                registerViewModel.registerDataChanged(usernameEditText.getText().toString(),
                         emalEditText.getText().toString(),
                         passwordEditText.getText().toString(),
                         repeatpasswordEditText.getText().toString());
