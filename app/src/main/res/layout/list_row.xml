@@ -2,41 +2,46 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-    <RelativeLayout
-
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:paddingStart="@dimen/fragment_horizontal_margin"
         android:paddingEnd="@dimen/fragment_horizontal_margin"
+        android:divider="?attr/dividerVertical"
+        android:showDividers="beginning"
         >
 
-        <TextView
-            android:id="@+id/restaurant_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/title"
-            android:text="TextView" />
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/fragment_vertical_margin"
+                android:paddingBottom="@dimen/fragment_vertical_margin">
 
-        <TextView
-            android:id="@+id/restaurant_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/location"
-            android:layout_below="@+id/restaurant_name"
-            android:text="TextView"
-            />
+                <TextView
+                    android:id="@+id/restaurant_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/title"
+                    android:textStyle="bold"
+                    android:text="TextView" />
 
-        <RatingBar
-            android:id="@+id/ratingBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/restaurant_location"
-            android:layout_alignParentEnd="true"
-            android:clickable="false"
-            style="?android:attr/ratingBarStyleSmall"/>
-    </RelativeLayout>
+                <TextView
+                    android:id="@+id/restaurant_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/location"
+                    android:layout_below="@+id/restaurant_name"
+                    android:textStyle="italic"
+                    android:text="TextView"
+                    />
+
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:layout_below="@+id/restaurant_location"/>
+
+        </RelativeLayout>
 
 </LinearLayout>
 
