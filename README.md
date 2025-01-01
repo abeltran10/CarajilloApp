@@ -6,6 +6,7 @@ CarajilloApp és una app per Android on els usuaris poden: crear un compte, inic
 
 ## Llançaments
 
+- [v2.0-beta](https://github.com/abeltran10/CarajilloApp/releases/tag/v2.0-beta)
 - [beta-v1.0](https://github.com/abeltran10/CarajilloApp/releases/tag/beta-v1.0)
 
 ## Què és un carajillo?
@@ -21,8 +22,9 @@ I és que com els cigalons de la nostra província, cap, perquè ningú com els 
 
 ## Demo
 
-Demo [beta-v1.0](https://github.com/abeltran10/CarajilloApp/releases/tag/beta-v1.0)
+Demo [v2.0-beta](https://github.com/abeltran10/CarajilloApp/releases/tag/v2.0-beta)
 
-[CarajilloApp-betav1.0.webm](https://github.com/user-attachments/assets/5dc73059-b40c-46a3-9a38-501724c25c3b)
+
+[v2.0-beta.webm](https://github.com/user-attachments/assets/643ea25d-c328-4e89-98ee-a6eef7d41f2b)
 
 
