@@ -27,15 +27,15 @@
         android:id="@+id/floatingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="320dp"
-        android:layout_marginTop="516dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="28dp"
         android:clickable="true"
         android:src="@android:drawable/ic_input_add"
         android:tint="@color/white"
         app:backgroundTint="@color/black"
         app:fabSize="normal"
-        app:layout_constraintStart_toStartOf="@+id/list_view"
-        app:layout_constraintTop_toTopOf="@+id/list_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:rippleColor="@color/grey" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
