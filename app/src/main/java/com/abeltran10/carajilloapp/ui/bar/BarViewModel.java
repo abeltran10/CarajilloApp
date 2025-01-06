@@ -45,7 +45,7 @@ public class BarViewModel extends ViewModel {
     public void barDataChanged(String name, String address, String city, String postalCode) {
         if (isNameValid(name) && isAddressValid(address) && isCityValid(city) && isPostalCodeValid(postalCode)) {
             barFormState.setValue(new BarFormState(true));
-        } else if (!postalCode.matches("[0-9]*")) {
+        } else if (!isPostalCodeValid(postalCode)) {
             barFormState.setValue(new BarFormState(R.string.invalid_postal_code));
         }
     }
