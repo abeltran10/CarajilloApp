@@ -63,17 +63,17 @@ public class BarRepository {
 
     private Result<Bar> createBar(String name, String address, String city, String postalCode) {
         Result<Bar> result = null;
-        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("address",address),
-                Filter.equalTo("city", city), Filter.equalTo("postalCode", postalCode)));
+        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("address",address.toUpperCase()),
+                Filter.equalTo("city", city.toUpperCase()), Filter.equalTo("postalCode", postalCode)));
 
         try {
             QuerySnapshot querySnapshot = Tasks.await(q.get());
 
             if (querySnapshot.getDocuments().isEmpty()) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("name", name);
-                map.put("address", address);
-                map.put("city", city);
+                map.put("name", name.toUpperCase());
+                map.put("address", address.toUpperCase());
+                map.put("city", city.toUpperCase());
                 map.put("postalCode", postalCode);
                 map.put("rating", 0.0);
 
