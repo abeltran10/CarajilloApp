@@ -25,8 +25,7 @@ android {
 
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        buildConfigField "String", "SECRETKEY", "\"" + properties.getProperty('secretkey') + "\""
-        buildConfigField "String", "INITVECTOR", "\"" + properties.getProperty('initvector') + "\""
+        buildConfigField "String", "APIKEY", "\"" + properties.getProperty('apikey') + "\""
     }
 
     buildTypes {
@@ -83,6 +82,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
     implementation ("com.firebaseui:firebase-ui-firestore:8.0.2")
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+
 
 
 
