@@ -28,10 +28,10 @@ public class BarViewModel extends ViewModel {
         return barFormState;
     }
 
-    public void create(String name, String address, String city, String postalCode) {
+    public void create(String name, String address, String number, String city, String postalCode) {
         // can be launched in a separate asynchronous job
 
-        barRepository.asyncCreateBar(name, address, city, postalCode, result -> {
+        barRepository.asyncCreateBar(name, address, number, city, postalCode, result -> {
             if (result instanceof Result.Success) {
                 Bar data = ((Result.Success<Bar>) result).getData();
                 barResult.postValue(new BarResult(new BarView(data.getName(), data.getAddress(),
@@ -42,11 +42,14 @@ public class BarViewModel extends ViewModel {
         });
     }
 
-    public void barDataChanged(String name, String address, String city, String postalCode) {
-        if (isNameValid(name) && isAddressValid(address) && isCityValid(city) && isPostalCodeValid(postalCode)) {
+    public void barDataChanged(String name, String address, String number, String city, String postalCode) {
+        if (isNameValid(name) && isAddressValid(address) && isNumberValid(number) && isCityValid(city)
+                && isPostalCodeValid(postalCode)) {
             barFormState.setValue(new BarFormState(true));
-        } else if (!postalCode.matches("[0-9]*")) {
+        } else if (!isPostalCodeValid(postalCode)) {
             barFormState.setValue(new BarFormState(R.string.invalid_postal_code));
+        } else if (!isNumberValid(number)) {
+            barFormState.setValue(new BarFormState(R.string.invalid_number));
         }
     }
 
@@ -56,6 +59,10 @@ public class BarViewModel extends ViewModel {
 
     private boolean isAddressValid(String address) {
         return address != null && !address.trim().isEmpty();
+    }
+
+    private boolean isNumberValid(String number) {
+        return number != null && !number.trim().isEmpty() && number.matches("[0-9]*");
     }
 
     private boolean isCityValid(String city) {

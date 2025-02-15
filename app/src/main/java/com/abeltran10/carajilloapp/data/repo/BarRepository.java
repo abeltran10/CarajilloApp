@@ -3,6 +3,8 @@ package com.abeltran10.carajilloapp.data.repo;
 import com.abeltran10.carajilloapp.data.RepositoryCallback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.abeltran10.carajilloapp.data.service.LocationService;
+import com.abeltran10.carajilloapp.data.service.LocationServiceImpl;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
 
 public class BarRepository {
 
@@ -47,10 +50,11 @@ public class BarRepository {
                 .build();
     }
 
-    public void asyncCreateBar(String name, String address, String city, String postalCode, RepositoryCallback<Bar> callback) {
+    public void asyncCreateBar(String name, String address, String number, String city, String postalCode,
+                               RepositoryCallback<Bar> callback) {
         Runnable runnable = () -> {
             try {
-                Result<Bar> result = createBar(name, address, city, postalCode);
+                Result<Bar> result = createBar(name, address, number, city, postalCode);
                 callback.onComplete(result);
             } catch (Exception e) {
                 Result<Bar> errorResult = new Result.Error(new IOException("Error al afegir el bar a la base de dades"));
@@ -61,18 +65,26 @@ public class BarRepository {
         new Thread(runnable).start();
     }
 
-    private Result<Bar> createBar(String name, String address, String city, String postalCode) {
+    private Result<Bar> createBar(String name, String address, String number, String city, String postalCode) {
+        LocationService location = new LocationServiceImpl();
         Result<Bar> result = null;
-        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("address",address),
+
+        name = name.toUpperCase();
+        address = address.toUpperCase();
+        city = city.toUpperCase();
+
+        boolean isAddresValid = location.isAddressValid(address, number, postalCode, city);
+
+        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("address",address + " " + number),
                 Filter.equalTo("city", city), Filter.equalTo("postalCode", postalCode)));
 
         try {
             QuerySnapshot querySnapshot = Tasks.await(q.get());
 
-            if (querySnapshot.getDocuments().isEmpty()) {
+            if (querySnapshot.getDocuments().isEmpty() && isAddresValid) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", name);
-                map.put("address", address);
+                map.put("address", address + " " + number);
                 map.put("city", city);
                 map.put("postalCode", postalCode);
                 map.put("rating", 0.0);
@@ -89,7 +101,7 @@ public class BarRepository {
 
                 result = new Result.Success<Bar>(bar);
             } else {
-                result = new Result.Error(new IOException("Ja s'ha registrat aquest bar"));
+                result = new Result.Error(new IOException("Ja s'ha registrat aquest bar o l'adreça no és valida"));
             }
 
         } catch (ExecutionException | InterruptedException e) {
