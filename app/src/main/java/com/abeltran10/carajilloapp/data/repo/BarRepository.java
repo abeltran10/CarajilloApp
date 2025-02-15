@@ -3,8 +3,8 @@ package com.abeltran10.carajilloapp.data.repo;
 import com.abeltran10.carajilloapp.data.RepositoryCallback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
-import com.abeltran10.carajilloapp.data.service.LocationServiceImpl;
 import com.abeltran10.carajilloapp.data.service.LocationService;
+import com.abeltran10.carajilloapp.data.service.LocationServiceImpl;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
@@ -14,9 +14,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
