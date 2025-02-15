@@ -61,6 +61,7 @@ public class BarFragment extends Fragment {
         EditText barName = binding.barName;
         EditText barCity = binding.barCity;
         EditText barAddress = binding.barAddress;
+        EditText barNumber = binding.barNumber;
         EditText barPostalCode = binding.barPostalCode;
         Button barCreate = binding.createBar;
 
@@ -105,13 +106,14 @@ public class BarFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 barViewModel.barDataChanged(barName.getText().toString(),
-                        barAddress.getText().toString(), barCity.getText().toString(),
-                        barPostalCode.getText().toString());
+                        barAddress.getText().toString(), barNumber.getText().toString(),
+                        barCity.getText().toString(), barPostalCode.getText().toString());
             }
         };
 
         barName.addTextChangedListener(afterTextChangedListener);
         barAddress.addTextChangedListener(afterTextChangedListener);
+        barNumber.addTextChangedListener(afterTextChangedListener);
         barCity.addTextChangedListener(afterTextChangedListener);
         barPostalCode.addTextChangedListener(afterTextChangedListener);
 
@@ -120,8 +122,8 @@ public class BarFragment extends Fragment {
             public void onClick(View v) {
                 loadingBar.setVisibility(View.VISIBLE);
                 barViewModel.create(barName.getText().toString(),
-                        barAddress.getText().toString(), barCity.getText().toString(),
-                        barPostalCode.getText().toString());
+                        barAddress.getText().toString(), barNumber.getText().toString(),
+                        barCity.getText().toString(), barPostalCode.getText().toString());
             }
         });
     }
