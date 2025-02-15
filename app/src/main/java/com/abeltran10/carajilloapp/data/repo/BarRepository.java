@@ -75,7 +75,7 @@ public class BarRepository {
 
         boolean isAddresValid = location.isAddressValid(address, number, postalCode, city);
 
-        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("address",address),
+        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("address",address + " " + number),
                 Filter.equalTo("city", city), Filter.equalTo("postalCode", postalCode)));
 
         try {

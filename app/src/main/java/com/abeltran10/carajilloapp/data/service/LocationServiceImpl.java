@@ -17,7 +17,8 @@ public class LocationServiceImpl implements LocationService {
     public boolean isAddressValid(String address, String number, String postalCode, String city) {
         OkHttpClient client = new OkHttpClient();
 
-        String formatedAddress = address.replace(" ", "%20") + "+" + number + "%2C+" + postalCode + "+" + city.replace(" ", "%20") + "%2C+" + "Spain";
+        String formatedAddress = address.replace(" ", "%20") + "+" + number + "%2C+" +
+                postalCode + "+" + city.replace(" ", "%20") + "%2C+" + "Spain";
 
         try {
 
