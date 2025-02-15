@@ -5,7 +5,7 @@
 CarajilloApp és una app per Android on els usuaris poden: crear un compte, iniciar sesió, insertar un bar i puntuar el seu carajillo. S'utilitza una bases de dades al nuvol amb Firebase.
 
 ## Llançaments
-
+- [v3.0-beta](https://github.com/abeltran10/CarajilloApp/releases/tag/v3.0-beta)
 - [v2.0-beta](https://github.com/abeltran10/CarajilloApp/releases/tag/v2.0-beta)
 - [beta-v1.0](https://github.com/abeltran10/CarajilloApp/releases/tag/beta-v1.0)
 
@@ -22,9 +22,9 @@ I és que com els cigalons de la nostra província, cap, perquè ningú com els 
 
 ## Demo
 
-Demo [v2.0-beta](https://github.com/abeltran10/CarajilloApp/releases/tag/v2.0-beta)
+Demo [Últim llançament](https://github.com/abeltran10/CarajilloApp/releases/tag/v3.0-beta)
 
 
-[v2.0-beta.webm](https://github.com/user-attachments/assets/643ea25d-c328-4e89-98ee-a6eef7d41f2b)
+[CarajilloApp-v3.0beta.webm](https://github.com/user-attachments/assets/cd80cb23-c2e4-4ef8-9c29-06bb0a7d2c9c)
 
 
