@@ -103,7 +103,7 @@ public class BarRepository {
             }
 
         } catch (ExecutionException | InterruptedException e) {
-            result = new Result.Error(new IOException("Ha agut un problema i no s'ha registrat el bar"));
+            result = new Result.Error(new IOException("Ha hagut un problema i no s'ha registrat el bar"));
         }
 
         return result;
