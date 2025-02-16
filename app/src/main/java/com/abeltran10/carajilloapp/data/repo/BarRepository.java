@@ -1,10 +1,8 @@
 package com.abeltran10.carajilloapp.data.repo;
 
-import com.abeltran10.carajilloapp.data.RepositoryCallback;
+import com.abeltran10.carajilloapp.data.Callback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
-import com.abeltran10.carajilloapp.data.service.LocationService;
-import com.abeltran10.carajilloapp.data.service.LocationServiceImpl;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
@@ -51,13 +49,13 @@ public class BarRepository {
     }
 
     public void asyncCreateBar(String name, String address, String number, String city, String postalCode,
-                               RepositoryCallback<Bar> callback) {
+                               Callback callback) {
         Runnable runnable = () -> {
             try {
-                Result<Bar> result = createBar(name, address, number, city, postalCode);
+                Result result = createBar(name, address, number, city, postalCode);
                 callback.onComplete(result);
             } catch (Exception e) {
-                Result<Bar> errorResult = new Result.Error(new IOException("Error al afegir el bar a la base de dades"));
+                Result errorResult = new Result.Error(new IOException("Error al afegir el bar a la base de dades"));
                 callback.onComplete(errorResult);
             }
         };
@@ -65,9 +63,9 @@ public class BarRepository {
         new Thread(runnable).start();
     }
 
-    private Result<Bar> createBar(String name, String address, String number, String city, String postalCode) {
-
-        Result<Bar> result = null;
+    private Result createBar(String name, String address, String number, String city, String postalCode) {
+        Result result = null;
+        Bar bar = null;
 
         name = name.toUpperCase();
         address = address.toUpperCase();
@@ -96,8 +94,9 @@ public class BarRepository {
                 bar.setPostalCode(postalCode);
                 bar.setRating((Double) map.get("rating"));
 
+                setBar(bar);
 
-                result = new Result.Success<Bar>(bar);
+                result = new Result.Success<Bar>(this.bar);
             } else {
                 result = new Result.Error(new IOException("Ja s'ha registrat aquest bar"));
             }

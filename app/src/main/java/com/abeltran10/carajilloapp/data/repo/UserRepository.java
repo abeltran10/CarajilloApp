@@ -1,6 +1,6 @@
 package com.abeltran10.carajilloapp.data.repo;
 
-import com.abeltran10.carajilloapp.data.RepositoryCallback;
+import com.abeltran10.carajilloapp.data.Callback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.User;
 import com.google.android.gms.tasks.Tasks;
@@ -46,9 +46,8 @@ public class UserRepository {
         this.user = user;
     }
 
-    public Result<User> login(String email, String password) {
-
-        Result<User> result = null;
+    public Result login(String email, String password) {
+        Result result = null;
         User user = null;
 
 
@@ -75,13 +74,13 @@ public class UserRepository {
         return result;
     }
 
-    public void asyncLogin(String email, String password, RepositoryCallback<User> callback) {
+    public void asyncLogin(String email, String password, Callback callback) {
         Runnable runnable = () -> {
             try {
-                Result<User> result = login(email, password);
+                Result result = login(email, password);
                 callback.onComplete(result);
             } catch (Exception e) {
-                Result<User> errorResult = new Result.Error(new IOException("Error al recuperar l'usuari"));
+                Result errorResult = new Result.Error(new IOException("Error al recuperar l'usuari"));
                 callback.onComplete(errorResult);
             }
         };
@@ -89,9 +88,8 @@ public class UserRepository {
         new Thread(runnable).start();
     }
 
-    public Result<User> create(String username, String email, String password) {
-
-        Result<User> result = null;
+    public Result create(String username, String email, String password) {
+        Result result = null;
         User user = null;
 
         try {
@@ -121,13 +119,13 @@ public class UserRepository {
         return result;
     }
 
-    public void asyncCreate(String username, String email, String password, RepositoryCallback<User> callback) {
+    public void asyncCreate(String username, String email, String password, Callback callback) {
         Runnable runnable = () -> {
             try {
-                Result<User> result = create(username, email, password);
+                Result result = create(username, email, password);
                 callback.onComplete(result);
             } catch (Exception e) {
-                Result<User> errorResult = new Result.Error(new IOException("Error al crear el compte"));
+                Result errorResult = new Result.Error(new IOException("Error al crear el compte"));
                 callback.onComplete(errorResult);
             }
         };

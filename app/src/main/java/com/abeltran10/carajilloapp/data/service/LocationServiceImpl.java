@@ -1,10 +1,8 @@
 package com.abeltran10.carajilloapp.data.service;
 
 import com.abeltran10.carajilloapp.BuildConfig;
-import com.abeltran10.carajilloapp.data.LocationCallback;
-import com.abeltran10.carajilloapp.data.RepositoryCallback;
+import com.abeltran10.carajilloapp.data.Callback;
 import com.abeltran10.carajilloapp.data.Result;
-import com.abeltran10.carajilloapp.data.model.Bar;
 
 import org.json.JSONObject;
 
@@ -20,7 +18,7 @@ public class LocationServiceImpl implements LocationService {
     private static final String BASE_URL = "https://api.opencagedata.com/geocode/v1/json";
 
 
-    private Result<Boolean> addressExists(String address, String number, String postalCode, String city) throws Exception {
+    private Result addressExists(String address, String number, String postalCode, String city) throws Exception {
         OkHttpClient client = new OkHttpClient();
 
         String formatedAddress = address.replace(" ", "%20") + "+" + number + "%2C+" +
@@ -53,13 +51,13 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public void asyncAddressExists(String address, String number, String postalCode, String city,
-                                   LocationCallback<Boolean> callback) {
+                                   Callback callback) {
         Runnable runnable = () -> {
             try {
-                Result<Boolean> result = addressExists(address, number, postalCode, city);
+                Result result = addressExists(address, number, postalCode, city);
                 callback.onComplete(result);
             } catch (Exception e) {
-                Result<Boolean> errorResult = new Result.Error(
+                Result errorResult = new Result.Error(
                         new IOException("Ha hagut un problema i no s'ha pogut validar l'adreça")
                 );
                 callback.onComplete(errorResult);
