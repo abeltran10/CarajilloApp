@@ -25,6 +25,4 @@
     <string name="action_create_bar">Afegir bar</string>
     <string name="invalid_postal_code">El còdi postal ha de ser un nombre</string>
     <string name="invalid_number">El nombre no és valid</string>
-    <string name="address_not_exists">L\'adreça no existeix</string>
-    <string name="address_validate_error">Ha hagut un problema i no s\'ha pogut validar l'adreça</string>
 </resources>
