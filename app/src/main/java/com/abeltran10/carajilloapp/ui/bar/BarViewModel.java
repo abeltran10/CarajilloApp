@@ -8,6 +8,8 @@ import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
+import com.abeltran10.carajilloapp.data.service.LocationService;
+import com.abeltran10.carajilloapp.data.service.LocationServiceImpl;
 
 public class BarViewModel extends ViewModel {
 
@@ -29,17 +31,28 @@ public class BarViewModel extends ViewModel {
     }
 
     public void create(String name, String address, String number, String city, String postalCode) {
-        // can be launched in a separate asynchronous job
+        boolean addressExists = false;
+        LocationService location = new LocationServiceImpl();
 
-        barRepository.asyncCreateBar(name, address, number, city, postalCode, result -> {
-            if (result instanceof Result.Success) {
-                Bar data = ((Result.Success<Bar>) result).getData();
-                barResult.postValue(new BarResult(new BarView(data.getName(), data.getAddress(),
-                        data.getCity(), data.getPostalCode())));
+        try {
+            addressExists = location.addressExists(address, number, postalCode, city);
+
+            if (!addressExists) {
+                barFormState.setValue(new BarFormState(R.string.address_not_exists));
             } else {
-                barResult.postValue(new BarResult(((Result.Error)result).getError().getMessage()));
+                barRepository.asyncCreateBar(name, address, number, city, postalCode, result -> {
+                    if (result instanceof Result.Success) {
+                        Bar data = ((Result.Success<Bar>) result).getData();
+                        barResult.postValue(new BarResult(new BarView(data.getName(), data.getAddress(),
+                                data.getCity(), data.getPostalCode())));
+                    } else {
+                        barResult.postValue(new BarResult(((Result.Error)result).getError().getMessage()));
+                    }
+                });
             }
-        });
+        } catch (Exception e) {
+            barFormState.setValue(new BarFormState(R.string.address_validate_error));
+        }
     }
 
     public void barDataChanged(String name, String address, String number, String city, String postalCode) {

@@ -66,14 +66,12 @@ public class BarRepository {
     }
 
     private Result<Bar> createBar(String name, String address, String number, String city, String postalCode) {
-        LocationService location = new LocationServiceImpl();
+
         Result<Bar> result = null;
 
         name = name.toUpperCase();
         address = address.toUpperCase();
         city = city.toUpperCase();
-
-        boolean isAddresValid = location.isAddressValid(address, number, postalCode, city);
 
         Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("address",address + " " + number),
                 Filter.equalTo("city", city), Filter.equalTo("postalCode", postalCode)));
@@ -81,7 +79,7 @@ public class BarRepository {
         try {
             QuerySnapshot querySnapshot = Tasks.await(q.get());
 
-            if (querySnapshot.getDocuments().isEmpty() && isAddresValid) {
+            if (querySnapshot.getDocuments().isEmpty()) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", name);
                 map.put("address", address + " " + number);
@@ -93,7 +91,7 @@ public class BarRepository {
 
                 bar = new Bar();
                 bar.setName(name);
-                bar.setAddress(address);
+                bar.setAddress(address + " " + number);
                 bar.setCity(city);
                 bar.setPostalCode(postalCode);
                 bar.setRating((Double) map.get("rating"));
@@ -101,7 +99,7 @@ public class BarRepository {
 
                 result = new Result.Success<Bar>(bar);
             } else {
-                result = new Result.Error(new IOException("Ja s'ha registrat aquest bar o l'adreça no és valida"));
+                result = new Result.Error(new IOException("Ja s'ha registrat aquest bar"));
             }
 
         } catch (ExecutionException | InterruptedException e) {
