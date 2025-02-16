@@ -16,7 +16,7 @@ import okhttp3.Response;
 
 public class LocationServiceImpl implements LocationService {
 
-    public static final String APIKEY = BuildConfig.APIKEY;
+    private static final String APIKEY = BuildConfig.APIKEY;
     private static final String BASE_URL = "https://api.opencagedata.com/geocode/v1/json";
 
 
