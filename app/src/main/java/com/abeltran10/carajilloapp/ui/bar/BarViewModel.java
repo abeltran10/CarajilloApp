@@ -16,6 +16,7 @@ public class BarViewModel extends ViewModel {
     private MutableLiveData<BarResult> barResult = new MutableLiveData<>();
     private BarRepository barRepository;
 
+    private LocationService locationService = new LocationServiceImpl();
     private MutableLiveData<BarFormState> barFormState = new MutableLiveData<>();
 
     BarViewModel(BarRepository barRepository) {
@@ -31,28 +32,27 @@ public class BarViewModel extends ViewModel {
     }
 
     public void create(String name, String address, String number, String city, String postalCode) {
-        boolean addressExists = false;
-        LocationService location = new LocationServiceImpl();
+        locationService.asyncAddressExists(address, number, postalCode, city, locationResult -> {
+            if (locationResult instanceof Result.Success) {
+                Boolean addressExists = ((Result.Success<Boolean>) locationResult).getData();
 
-        try {
-            addressExists = location.addressExists(address, number, postalCode, city);
-
-            if (!addressExists) {
-                barFormState.setValue(new BarFormState(R.string.address_not_exists));
+                if (addressExists) {
+                    barRepository.asyncCreateBar(name, address, number, city, postalCode, repositoryResult -> {
+                        if (repositoryResult instanceof Result.Success) {
+                            Bar data = ((Result.Success<Bar>) repositoryResult).getData();
+                            barResult.postValue(new BarResult(new BarView(data.getName(), data.getAddress(),
+                                    data.getCity(), data.getPostalCode())));
+                        } else {
+                            barResult.postValue(new BarResult(((Result.Error)repositoryResult).getError().getMessage()));
+                        }
+                    });
+                } else {
+                    barResult.postValue(new BarResult("L'adreça no existeix"));
+                }
             } else {
-                barRepository.asyncCreateBar(name, address, number, city, postalCode, result -> {
-                    if (result instanceof Result.Success) {
-                        Bar data = ((Result.Success<Bar>) result).getData();
-                        barResult.postValue(new BarResult(new BarView(data.getName(), data.getAddress(),
-                                data.getCity(), data.getPostalCode())));
-                    } else {
-                        barResult.postValue(new BarResult(((Result.Error)result).getError().getMessage()));
-                    }
-                });
+                barResult.postValue(new BarResult(((Result.Error)locationResult).getError().getMessage()));
             }
-        } catch (Exception e) {
-            barFormState.setValue(new BarFormState(R.string.address_validate_error));
-        }
+        });
     }
 
     public void barDataChanged(String name, String address, String number, String city, String postalCode) {

@@ -1,8 +1,10 @@
 package com.abeltran10.carajilloapp.data.service;
 
+import com.abeltran10.carajilloapp.data.LocationCallback;
+
 public interface LocationService {
 
-
-     boolean addressExists(String address, String number, String postalCode, String city) throws Exception;
+     void asyncAddressExists(String address, String number, String postalCode, String city,
+                           LocationCallback<Boolean> callback);
 
 }
