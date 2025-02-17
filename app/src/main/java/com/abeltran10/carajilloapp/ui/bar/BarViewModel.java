@@ -11,8 +11,11 @@ import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.service.LocationService;
 import com.abeltran10.carajilloapp.data.service.LocationServiceImpl;
 
-public class BarViewModel extends ViewModel {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+public class BarViewModel extends ViewModel {
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private MutableLiveData<BarResult> barResult = new MutableLiveData<>();
     private BarRepository barRepository;
 
@@ -32,27 +35,30 @@ public class BarViewModel extends ViewModel {
     }
 
     public void create(String name, String address, String number, String city, String postalCode) {
-        locationService.asyncAddressExists(address, number, postalCode, city, locationResult -> {
+        executorService.execute(() -> {
+
+            Result locationResult = locationService.addressExists(address, number, postalCode, city);
             if (locationResult instanceof Result.Success) {
-                Boolean addressExists = ((Result.Success<Boolean>) locationResult).getData();
+                Boolean addressExists = ((Result.Success<Boolean>)locationResult).getData();
 
                 if (addressExists) {
-                    barRepository.asyncCreateBar(name, address, number, city, postalCode, repositoryResult -> {
-                        if (repositoryResult instanceof Result.Success) {
-                            Bar data = ((Result.Success<Bar>) repositoryResult).getData();
-                            barResult.postValue(new BarResult(new BarView(data.getName(), data.getAddress(),
-                                    data.getCity(), data.getPostalCode())));
-                        } else {
-                            barResult.postValue(new BarResult(((Result.Error)repositoryResult).getError().getMessage()));
-                        }
-                    });
+                    Result repositoryResult = barRepository.createBar(name, address, number, city, postalCode);
+                    if (repositoryResult instanceof Result.Success) {
+                        Bar data = ((Result.Success<Bar>) repositoryResult).getData();
+                        barResult.postValue(new BarResult(new BarView(data.getName(), data.getAddress(),
+                                data.getCity(), data.getPostalCode())));
+                    } else {
+                        barResult.postValue(new BarResult(((Result.Error)repositoryResult).getError().getMessage()));
+                    }
                 } else {
                     barResult.postValue(new BarResult("L'adreça no existeix"));
                 }
             } else {
                 barResult.postValue(new BarResult(((Result.Error)locationResult).getError().getMessage()));
             }
+
         });
+
     }
 
     public void barDataChanged(String name, String address, String number, String city, String postalCode) {

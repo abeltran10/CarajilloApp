@@ -48,22 +48,8 @@ public class BarRepository {
                 .build();
     }
 
-    public void asyncCreateBar(String name, String address, String number, String city, String postalCode,
-                               Callback callback) {
-        Runnable runnable = () -> {
-            try {
-                Result result = createBar(name, address, number, city, postalCode);
-                callback.onComplete(result);
-            } catch (Exception e) {
-                Result errorResult = new Result.Error(new IOException("Error al afegir el bar a la base de dades"));
-                callback.onComplete(errorResult);
-            }
-        };
 
-        new Thread(runnable).start();
-    }
-
-    private Result createBar(String name, String address, String number, String city, String postalCode) {
+    public Result createBar(String name, String address, String number, String city, String postalCode) {
         Result result = null;
         Bar bar = null;
 

@@ -74,20 +74,6 @@ public class UserRepository {
         return result;
     }
 
-    public void asyncLogin(String email, String password, Callback callback) {
-        Runnable runnable = () -> {
-            try {
-                Result result = login(email, password);
-                callback.onComplete(result);
-            } catch (Exception e) {
-                Result errorResult = new Result.Error(new IOException("Error al recuperar l'usuari"));
-                callback.onComplete(errorResult);
-            }
-        };
-
-        new Thread(runnable).start();
-    }
-
     public Result create(String username, String email, String password) {
         Result result = null;
         User user = null;
@@ -117,20 +103,6 @@ public class UserRepository {
         }
 
         return result;
-    }
-
-    public void asyncCreate(String username, String email, String password, Callback callback) {
-        Runnable runnable = () -> {
-            try {
-                Result result = create(username, email, password);
-                callback.onComplete(result);
-            } catch (Exception e) {
-                Result errorResult = new Result.Error(new IOException("Error al crear el compte"));
-                callback.onComplete(errorResult);
-            }
-        };
-
-        new Thread(runnable).start();
     }
 
 }

@@ -11,8 +11,11 @@ import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.User;
 import com.abeltran10.carajilloapp.data.repo.UserRepository;
 
-public class RegisterViewModel extends ViewModel {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+public class RegisterViewModel extends ViewModel {
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private MutableLiveData<RegisterResult> registerResult = new MutableLiveData<>();
     private UserRepository userRepository;
 
@@ -31,9 +34,8 @@ public class RegisterViewModel extends ViewModel {
     }
 
     public void create(String username, String email, String password) {
-        // can be launched in a separate asynchronous job
-
-        userRepository.asyncCreate(username, email, password, result -> {
+        executorService.execute(() -> {
+            Result result = userRepository.create(username, email, password);
             if (result instanceof Result.Success) {
                 User data = ((Result.Success<User>) result).getData();
                 registerResult.postValue(new RegisterResult(new RegisterView(data.getUsername())));
