@@ -57,7 +57,8 @@ public class BarRepository {
         address = address.toUpperCase();
         city = city.toUpperCase();
 
-        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("address",address + " " + number),
+        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("name", name),
+                Filter.equalTo("address",address + " " + number),
                 Filter.equalTo("city", city), Filter.equalTo("postalCode", postalCode)));
 
         try {
