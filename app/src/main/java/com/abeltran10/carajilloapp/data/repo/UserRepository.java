@@ -1,6 +1,5 @@
 package com.abeltran10.carajilloapp.data.repo;
 
-import com.abeltran10.carajilloapp.data.Callback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.User;
 import com.google.android.gms.tasks.Tasks;
@@ -9,7 +8,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 /**
