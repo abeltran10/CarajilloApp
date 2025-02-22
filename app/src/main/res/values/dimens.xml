@@ -4,4 +4,6 @@
     <dimen name="fragment_vertical_margin">16dp</dimen>
     <dimen name="title">25dp</dimen>
     <dimen name="location">15dp</dimen>
+    <dimen name="detail_title">40dp</dimen>
+    <dimen name="detail_location">25dp</dimen>
 </resources>
