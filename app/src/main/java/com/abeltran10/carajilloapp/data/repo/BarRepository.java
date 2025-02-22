@@ -1,9 +1,7 @@
 package com.abeltran10.carajilloapp.data.repo;
 
-import com.abeltran10.carajilloapp.data.Callback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.Filter;
@@ -39,13 +37,10 @@ public class BarRepository {
         return instance;
     }
 
-    public FirestoreRecyclerOptions<Bar> getBars() {
+    public Query getBarQuery() {
         CollectionReference ref = bd.collection("bars");
-        Query q = ref.orderBy("name", Query.Direction.ASCENDING);
 
-        return new FirestoreRecyclerOptions.Builder<Bar>()
-                .setQuery(q, Bar.class)
-                .build();
+        return ref.orderBy("name", Query.Direction.ASCENDING);
     }
 
 
