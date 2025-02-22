@@ -13,8 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abeltran10.carajilloapp.R;
+import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.databinding.FragmentMainBinding;
 import com.abeltran10.carajilloapp.ui.bar.BarFragment;
+import com.abeltran10.carajilloapp.ui.detail.DetailBarFragment;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainFragment extends Fragment {
@@ -34,13 +37,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mainViewModel = new ViewModelProvider(this, new MainViewModelFactory())
-                .get(MainViewModel.class);
-
-
-        mainViewModel.loadBarOptions();
-        mainAdapter = new MainAdapter(mainViewModel.getOptions());
     }
 
 
@@ -55,6 +51,26 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mainViewModel = new ViewModelProvider(this, new MainViewModelFactory())
+                .get(MainViewModel.class);
+
+        FirestoreRecyclerOptions<Bar> options = new FirestoreRecyclerOptions.Builder<Bar>()
+                .setQuery(mainViewModel.getBarQuery(), Bar.class)
+                .build();
+
+        mainAdapter = new MainAdapter(options, (name, location, rating) -> {
+            if (getContext() != null && getContext().getApplicationContext() != null) {
+                Bundle bundle = new Bundle();
+                bundle.putString("name", name);
+                bundle.putString("location", location);
+                bundle.putDouble("rating", rating);
+
+                requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
+                        .replace(R.id.frame_container, DetailBarFragment.class, bundle)
+                        .addToBackStack("main")
+                        .commit();
+            }
+        });
 
         RecyclerView recyclerView = binding.listView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

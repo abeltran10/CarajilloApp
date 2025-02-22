@@ -16,15 +16,15 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewHolder> {
+    private OnItemClickListener listener;
 
-    /**
-     * Create a new RecyclerView adapter that listens to a Firestore Query.  See {@link
-     * FirestoreRecyclerOptions} for configuration options.
-     *
-     * @param options
-     */
-    public MainAdapter(@NonNull FirestoreRecyclerOptions<Bar> options) {
+    public interface OnItemClickListener {
+        void onItemClick(String name, String location, Double rating);
+    }
+
+    public MainAdapter(@NonNull FirestoreRecyclerOptions<Bar> options, OnItemClickListener listener) {
         super(options);
+        this.listener = listener;
     }
 
 
@@ -75,8 +75,11 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder viewHolder, int position, @NonNull Bar bar) {
         viewHolder.getRestaurantName().setText(bar.getName().toUpperCase());
-        viewHolder.getRestaurantLocation().setText(bar.getCity().toUpperCase() + " - " + bar.getAddress().toUpperCase() + " (" + bar.getPostalCode() + ")");
+        String location = bar.getCity().toUpperCase() + " - " + bar.getAddress().toUpperCase() + " (" + bar.getPostalCode() + ")";
+        viewHolder.getRestaurantLocation().setText(location);
         viewHolder.getRating().setRating(bar.getRating().floatValue());
+
+        viewHolder.itemView.setOnClickListener(view -> listener.onItemClick(bar.getName(), location, bar.getRating()));
     }
 
     @NonNull
