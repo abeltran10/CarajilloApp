@@ -74,7 +74,7 @@ public class BarRepository {
                 bar.setAddress(address + " " + number);
                 bar.setCity(city);
                 bar.setPostalCode(postalCode);
-                bar.setRating((Double) map.get("rating"));
+                bar.setRating((Float) map.get("rating"));
 
                 setBar(bar);
 

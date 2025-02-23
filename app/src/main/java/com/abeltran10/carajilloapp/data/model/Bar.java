@@ -10,7 +10,7 @@ public class Bar {
 
     private String postalCode;
 
-    private Double rating;
+    private Float rating;
 
     public Bar() {
     }
@@ -47,11 +47,11 @@ public class Bar {
         this.postalCode = postalCode;
     }
 
-    public Double getRating() {
+    public Float getRating() {
         return rating;
     }
 
-    public void setRating(Double rating) {
+    public void setRating(Float rating) {
         this.rating = rating;
     }
 }

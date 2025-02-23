@@ -63,7 +63,7 @@ public class MainFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putString("name", name);
                 bundle.putString("location", location);
-                bundle.putDouble("rating", rating);
+                bundle.putFloat("rating", rating);
 
                 DetailBarFragment detailBarFragment = DetailBarFragment.newInstance();
                 detailBarFragment.setArguments(bundle);

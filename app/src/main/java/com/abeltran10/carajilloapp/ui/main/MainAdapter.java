@@ -19,7 +19,7 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(String name, String location, Double rating);
+        void onItemClick(String name, String location, Float rating);
     }
 
     public MainAdapter(@NonNull FirestoreRecyclerOptions<Bar> options, OnItemClickListener listener) {
@@ -77,7 +77,7 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
         viewHolder.getRestaurantName().setText(bar.getName().toUpperCase());
         String location = bar.getCity().toUpperCase() + " - " + bar.getAddress().toUpperCase() + " (" + bar.getPostalCode() + ")";
         viewHolder.getRestaurantLocation().setText(location);
-        viewHolder.getRating().setRating(bar.getRating().floatValue());
+        viewHolder.getRating().setRating(bar.getRating());
 
         viewHolder.itemView.setOnClickListener(view -> listener.onItemClick(bar.getName(), location, bar.getRating()));
     }

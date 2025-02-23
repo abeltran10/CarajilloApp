@@ -42,7 +42,7 @@ public class DetailBarFragment extends Fragment {
         if (getArguments() != null) {
             String name = getArguments().getString("name");
             String location = getArguments().getString("location");
-            Double rating = getArguments().getDouble("rating");
+            Float rating = getArguments().getFloat("rating");
 
             TextView barName = detailBarBinding.name;
             TextView barLocation = detailBarBinding.location;
@@ -50,7 +50,7 @@ public class DetailBarFragment extends Fragment {
 
             barName.setText(name);
             barLocation.setText(location);
-            barRating.setRating(rating.floatValue());
+            barRating.setRating(rating);
         }
 
 
