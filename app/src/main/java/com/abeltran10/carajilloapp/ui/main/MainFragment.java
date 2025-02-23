@@ -65,8 +65,11 @@ public class MainFragment extends Fragment {
                 bundle.putString("location", location);
                 bundle.putDouble("rating", rating);
 
+                DetailBarFragment detailBarFragment = DetailBarFragment.newInstance();
+                detailBarFragment.setArguments(bundle);
+
                 requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
-                        .replace(R.id.frame_container, DetailBarFragment.class, bundle)
+                        .replace(R.id.frame_container, detailBarFragment)
                         .addToBackStack("main")
                         .commit();
             }
