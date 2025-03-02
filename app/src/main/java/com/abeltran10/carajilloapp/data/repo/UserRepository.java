@@ -32,6 +32,9 @@ public class UserRepository {
         return instance;
     }
 
+    public FirebaseUser getCurrentUser() {
+        return mAuth.getCurrentUser();
+    }
     public boolean isLoggedIn() {
         return user != null;
     }

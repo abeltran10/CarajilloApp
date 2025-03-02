@@ -16,7 +16,7 @@ import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.databinding.FragmentMainBinding;
 import com.abeltran10.carajilloapp.ui.bar.BarFragment;
-import com.abeltran10.carajilloapp.ui.detail.DetailBarFragment;
+import com.abeltran10.carajilloapp.ui.rating.RatingDialogFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -58,20 +58,16 @@ public class MainFragment extends Fragment {
                 .setQuery(mainViewModel.getBarQuery(), Bar.class)
                 .build();
 
-        mainAdapter = new MainAdapter(options, (name, location, rating) -> {
+        mainAdapter = new MainAdapter(options, (bar) -> {
             if (getContext() != null && getContext().getApplicationContext() != null) {
                 Bundle bundle = new Bundle();
-                bundle.putString("name", name);
-                bundle.putString("location", location);
-                bundle.putFloat("rating", rating);
+                bundle.putString("name", bar.getName());
+                bundle.putFloat("rating", bar.getRating());
 
-                DetailBarFragment detailBarFragment = DetailBarFragment.newInstance();
-                detailBarFragment.setArguments(bundle);
+                RatingDialogFragment ratingDialogFragment = RatingDialogFragment.newInstance();
+                ratingDialogFragment.setArguments(bundle);
 
-                requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
-                        .replace(R.id.frame_container, detailBarFragment)
-                        .addToBackStack("main")
-                        .commit();
+                ratingDialogFragment.show(requireActivity().getSupportFragmentManager(), "ratingDialog");
             }
         });
 
