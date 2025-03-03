@@ -3,6 +3,8 @@ package com.abeltran10.carajilloapp.data.repo;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
@@ -62,8 +64,9 @@ public class BarRepository {
 
             if (querySnapshot.getDocuments().isEmpty()) {
 
-                QuerySnapshot querySnapshot1 = Tasks.await(bd.collection("bars").get());
-                String idBar = String.valueOf(querySnapshot1.getDocuments().size() + 1);
+                AggregateQuerySnapshot aggregateQuerySnapshot = Tasks.await(bd.collection("bars")
+                        .count().get(AggregateSource.SERVER));
+                String idBar = String.valueOf(aggregateQuerySnapshot.getCount() + 1);
 
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", idBar);
@@ -81,8 +84,8 @@ public class BarRepository {
                 bar.setAddress(address + " " + number);
                 bar.setCity(city);
                 bar.setPostalCode(postalCode);
-                bar.setRating(Float.valueOf(map.get("rating").toString()));
-                bar.setTotalVotes(Long.valueOf(map.get("totalVotes").toString()));
+                bar.setRating(((Number)map.get("rating")).floatValue());
+                bar.setTotalVotes(((Number)map.get("totalVotes")).longValue());
                 setBar(bar);
 
                 result = new Result.Success<Bar>(this.bar);
