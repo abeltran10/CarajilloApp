@@ -42,7 +42,7 @@ public class RatingDialogFragment extends DialogFragment {
         builder.setTitle(name);
         builder.setView(view);
         builder.setPositiveButton("Puntuar", (dialog, which) -> {
-            ratingDialogViewModel.vote(rating, ratingBar.getRating(), totalVotes, idBar);
+            ratingDialogViewModel.vote(rating, ratingBar.getRating(), totalVotes, idBar, name);
         });
         builder.setNegativeButton("Cancel·lar", null);
 

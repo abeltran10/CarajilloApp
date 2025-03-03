@@ -8,17 +8,21 @@ import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.model.Rating;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.repo.RatingRepository;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class RatingDialogViewModel extends ViewModel {
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    //private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private BarRepository barRepository;
 
     private RatingRepository ratingRepository;
+
+    private FirebaseFirestore bd = FirebaseFirestore.getInstance();
 
     private MutableLiveData<RatingResult> ratingResult = new MutableLiveData<>();
 
@@ -31,28 +35,24 @@ public class RatingDialogViewModel extends ViewModel {
         return ratingResult;
     }
 
-    public void vote(Float oldRating, Float newRating, Long totalVotes, String idBar) {
-        executorService.execute(() -> {
+    public void vote(Float oldRating, Float newRating, Long totalVotes, String idBar, String name) {
+          bd.runTransaction((transaction) -> {
+                Float oldTotal = oldRating * totalVotes;
+                Float averageResult = (oldTotal + newRating) / (totalVotes + 1);
+                try {
+                    ratingRepository.vote(transaction, newRating, idBar);
+                    barRepository.updateBar(transaction, averageResult, idBar);
 
-            Float oldTotal = oldRating * totalVotes;
-            Float averageResult = (oldTotal + newRating) / (totalVotes + 1);
-
-            Result resultVote = ratingRepository.vote(newRating, idBar);
-
-            if (resultVote instanceof Result.Success) {
-                Rating dataRating = ((Result.Success<Rating>) resultVote).getData();
-
-                Result resultBar = barRepository.updateBar(averageResult, idBar);
-
-                if (resultBar instanceof Result.Success) {
-                    Bar dataBar = ((Result.Success<Bar>) resultBar).getData();
-                    ratingResult.postValue(new RatingResult(new RatingView(dataBar.getName(), dataRating.getVote())));
-                } else {
-                   ratingResult.postValue(new RatingResult((((Result.Error)resultBar).getError().getMessage())));
+                } catch (IOException e) {
+                    throw new RuntimeException(e.getMessage());
                 }
-            } else {
-                ratingResult.postValue(new RatingResult((((Result.Error)resultVote).getError().getMessage())));
-            }
-        });
+
+                return null;
+            }).addOnSuccessListener(aVoid -> {
+                ratingResult.postValue(new RatingResult(new RatingView(name, newRating)));
+            }).addOnFailureListener(e -> {
+                ratingResult.postValue(new RatingResult(e.getMessage()));
+            });
+
     }
 }

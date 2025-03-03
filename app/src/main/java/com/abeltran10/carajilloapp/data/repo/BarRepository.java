@@ -6,11 +6,13 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.AggregateQuerySnapshot;
 import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -102,31 +104,24 @@ public class BarRepository {
     }
 
 
-    public Result updateBar(Float averageResult, String idBar) {
-        Result result = null;
+    public void updateBar(Transaction transaction, Float averageResult, String idBar) throws IOException {
         Map<String, Object> map = new HashMap<>();
 
         try {
             DocumentSnapshot documentSnapshot = Tasks.await(bd.collection("bars").document(idBar).get());
+            map.put("name", documentSnapshot.getString("name"));
+            map.put("city", documentSnapshot.getString("city"));
+            map.put("address", documentSnapshot.getString("address"));
+            map.put("postalCode", documentSnapshot.getString("postalCode"));
             map.put("rating", averageResult);
             map.put("totalVotes", documentSnapshot.getLong("totalVotes") + 1L);
 
-            Tasks.await(bd.collection("bars").document(idBar).update(map));
+            DocumentReference documentReference = bd.collection("bars").document(idBar);
+            transaction.set(documentReference, map);
 
-            Bar bar = new Bar(idBar);
-            bar.setName(documentSnapshot.getString("name"));
-            bar.setCity(documentSnapshot.getString("city"));
-            bar.setAddress(documentSnapshot.getString("address"));
-            bar.setPostalCode(documentSnapshot.getString("postalCode"));
-            bar.setRating(averageResult);
-            bar.setTotalVotes((Long) map.get("totalVotes"));
-            setBar(bar);
-
-            result = new Result.Success<Bar>(this.bar);
         } catch (ExecutionException | InterruptedException e) {
-            result = new Result.Error(new IOException("Ha hagut un problema al actualitzar la puntucació del bar"));
+            throw new IOException("Ha hagut un problema al actualitzar la puntucació del bar");
         }
 
-        return result;
     }
 }

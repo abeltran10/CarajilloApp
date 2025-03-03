@@ -4,10 +4,12 @@ import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Rating;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,9 +37,7 @@ public class RatingRepository {
         return instance;
     }
 
-    public Result vote(Float newRating, String idBar) {
-        Result result = null;
-
+    public void vote(Transaction transaction, Float newRating, String idBar) throws IOException {
         String idUser = mAuth.getCurrentUser().getUid();
         Query q = bd.collection("ratings").where(Filter.and(Filter.equalTo("idBar", idBar),
                 Filter.equalTo("idUser", idUser)));
@@ -50,26 +50,17 @@ public class RatingRepository {
                 map.put("idUser", idUser);
                 map.put("rating", newRating);
 
-                Tasks.await(bd.collection("ratings").add(map));
-
-                Rating rating = new Rating();
-                rating.setBarId(idBar);
-                rating.setUserId(idUser);
-                rating.setVote(newRating);
-
-                setRating(rating);
-
-                result = new Result.Success<Rating>(this.rating);
+                DocumentReference documentReference = bd.collection("ratings").document();
+                transaction.set(documentReference, map);
 
             } else {
-                result = new Result.Error(new IOException("No pots tornar a puntuar aquest bar"));
+                throw new IOException("No pots tornar a puntuar aquest bar");
             }
 
 
         } catch (ExecutionException | InterruptedException e) {
-            result = new Result.Error(new IOException("Ha hagut un problema al registrar la puntuació"));
+            throw new IOException("Ha hagut un problema al registrar la puntuació");
         }
 
-        return result;
     }
 }
