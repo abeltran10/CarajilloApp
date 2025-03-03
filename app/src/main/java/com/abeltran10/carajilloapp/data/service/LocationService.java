@@ -1,8 +1,9 @@
 package com.abeltran10.carajilloapp.data.service;
 
+import com.abeltran10.carajilloapp.data.Result;
+
 public interface LocationService {
 
-
-     boolean isAddressValid(String address, String number, String postalCode, String city);
+     Result addressExists(String address, String number, String postalCode, String city);
 
 }

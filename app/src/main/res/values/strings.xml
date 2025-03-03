@@ -19,10 +19,13 @@
     <!-- Strings related to bar -->
     <string name="prompt_bar_name">Nom del bar</string>
     <string name="prompt_bar_city">Ciutat</string>
-    <string name="prompt_bar_address">Direcció</string>
+    <string name="prompt_bar_address">Carrer/Avinguda/Plaça</string>
     <string name="prompt_bar_number">Nombre</string>
     <string name="prompt_bar_postal_code">Còdi postal</string>
     <string name="action_create_bar">Afegir bar</string>
     <string name="invalid_postal_code">El còdi postal ha de ser un nombre</string>
     <string name="invalid_number">El nombre no és valid</string>
+
+    <!-- Rating strings -->
+    <string name="action_vote">Puntuar</string>
 </resources>

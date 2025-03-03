@@ -3,7 +3,7 @@ package com.abeltran10.carajilloapp.data;
 /**
  * A generic class that holds a result success w/ data or an error exception.
  */
-public class Result<T> {
+public class Result {
     // hide the private constructor to limit subclass types (Success, Error)
     private Result() {
     }

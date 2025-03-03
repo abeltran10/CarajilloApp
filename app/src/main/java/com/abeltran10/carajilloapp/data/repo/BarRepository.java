@@ -1,13 +1,10 @@
 package com.abeltran10.carajilloapp.data.repo;
 
-import com.abeltran10.carajilloapp.data.RepositoryCallback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
-import com.abeltran10.carajilloapp.data.service.LocationService;
-import com.abeltran10.carajilloapp.data.service.LocationServiceImpl;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -41,74 +38,92 @@ public class BarRepository {
         return instance;
     }
 
-    public FirestoreRecyclerOptions<Bar> getBars() {
+    public Query getBarQuery() {
         CollectionReference ref = bd.collection("bars");
-        Query q = ref.orderBy("name", Query.Direction.ASCENDING);
 
-        return new FirestoreRecyclerOptions.Builder<Bar>()
-                .setQuery(q, Bar.class)
-                .build();
+        return ref.orderBy("name", Query.Direction.ASCENDING);
     }
 
-    public void asyncCreateBar(String name, String address, String number, String city, String postalCode,
-                               RepositoryCallback<Bar> callback) {
-        Runnable runnable = () -> {
-            try {
-                Result<Bar> result = createBar(name, address, number, city, postalCode);
-                callback.onComplete(result);
-            } catch (Exception e) {
-                Result<Bar> errorResult = new Result.Error(new IOException("Error al afegir el bar a la base de dades"));
-                callback.onComplete(errorResult);
-            }
-        };
 
-        new Thread(runnable).start();
-    }
-
-    private Result<Bar> createBar(String name, String address, String number, String city, String postalCode) {
-        LocationService location = new LocationServiceImpl();
-        Result<Bar> result = null;
+    public Result createBar(String name, String address, String number, String city, String postalCode) {
+        Result result = null;
+        Bar bar = null;
 
         name = name.toUpperCase();
         address = address.toUpperCase();
         city = city.toUpperCase();
 
-        boolean isAddresValid = location.isAddressValid(address, number, postalCode, city);
-
-        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("address",address + " " + number),
+        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("name", name),
+                Filter.equalTo("address",address + " " + number),
                 Filter.equalTo("city", city), Filter.equalTo("postalCode", postalCode)));
 
         try {
             QuerySnapshot querySnapshot = Tasks.await(q.get());
 
-            if (querySnapshot.getDocuments().isEmpty() && isAddresValid) {
+            if (querySnapshot.getDocuments().isEmpty()) {
+
+                QuerySnapshot querySnapshot1 = Tasks.await(bd.collection("bars").get());
+                String idBar = String.valueOf(querySnapshot1.getDocuments().size() + 1);
+
                 Map<String, Object> map = new HashMap<>();
+                map.put("id", idBar);
                 map.put("name", name);
                 map.put("address", address + " " + number);
                 map.put("city", city);
                 map.put("postalCode", postalCode);
                 map.put("rating", 0.0);
+                map.put("totalVotes", 0);
 
-                Tasks.await(bd.collection("bars").add(map));
+                Tasks.await(bd.collection("bars").document(idBar).set(map));
 
-                bar = new Bar();
+                bar = new Bar(idBar);
                 bar.setName(name);
-                bar.setAddress(address);
+                bar.setAddress(address + " " + number);
                 bar.setCity(city);
                 bar.setPostalCode(postalCode);
-                bar.setRating((Double) map.get("rating"));
+                bar.setRating(Float.valueOf(map.get("rating").toString()));
+                bar.setTotalVotes(Long.valueOf(map.get("totalVotes").toString()));
+                setBar(bar);
 
-
-                result = new Result.Success<Bar>(bar);
+                result = new Result.Success<Bar>(this.bar);
             } else {
-                result = new Result.Error(new IOException("Ja s'ha registrat aquest bar o l'adreça no és valida"));
+                result = new Result.Error(new IOException("Ja s'ha registrat aquest bar"));
             }
 
         } catch (ExecutionException | InterruptedException e) {
-            result = new Result.Error(new IOException("Ha agut un problema i no s'ha registrat el bar"));
+            result = new Result.Error(new IOException("Ha hagut un problema i no s'ha registrat el bar"));
         }
 
         return result;
 
+    }
+
+
+    public Result updateBar(Float averageResult, String idBar) {
+        Result result = null;
+        Map<String, Object> map = new HashMap<>();
+
+        try {
+            DocumentSnapshot documentSnapshot = Tasks.await(bd.collection("bars").document(idBar).get());
+            map.put("rating", averageResult);
+            map.put("totalVotes", documentSnapshot.getLong("totalVotes") + 1L);
+
+            Tasks.await(bd.collection("bars").document(idBar).update(map));
+
+            Bar bar = new Bar(idBar);
+            bar.setName(documentSnapshot.getString("name"));
+            bar.setCity(documentSnapshot.getString("city"));
+            bar.setAddress(documentSnapshot.getString("address"));
+            bar.setPostalCode(documentSnapshot.getString("postalCode"));
+            bar.setRating(averageResult);
+            bar.setTotalVotes((Long) map.get("totalVotes"));
+            setBar(bar);
+
+            result = new Result.Success<Bar>(this.bar);
+        } catch (ExecutionException | InterruptedException e) {
+            result = new Result.Error(new IOException("Ha hagut un problema al actualitzar la puntucació del bar"));
+        }
+
+        return result;
     }
 }
