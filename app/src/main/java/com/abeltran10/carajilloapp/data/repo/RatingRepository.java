@@ -62,7 +62,7 @@ public class RatingRepository {
                 result = new Result.Success<Rating>(this.rating);
 
             } else {
-                result = new Result.Error(new IOException("No pots tornar a puntuar aqust bar"));
+                result = new Result.Error(new IOException("No pots tornar a puntuar aquest bar"));
             }
 
 
