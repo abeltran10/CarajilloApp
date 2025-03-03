@@ -9,7 +9,6 @@ import com.abeltran10.carajilloapp.data.model.Rating;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.repo.RatingRepository;
 
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

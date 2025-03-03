@@ -23,7 +23,6 @@ import com.abeltran10.carajilloapp.ui.rating.RatingDialogViewModel;
 import com.abeltran10.carajilloapp.ui.rating.RatingDialogViewModelFactory;
 import com.abeltran10.carajilloapp.ui.rating.RatingResult;
 import com.abeltran10.carajilloapp.ui.rating.RatingView;
-import com.abeltran10.carajilloapp.ui.register.RegisterViewModelFactory;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
