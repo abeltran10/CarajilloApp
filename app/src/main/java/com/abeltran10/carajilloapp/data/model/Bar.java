@@ -2,6 +2,8 @@ package com.abeltran10.carajilloapp.data.model;
 
 public class Bar {
 
+    private String id;
+
     private String name;
 
     private String city;
@@ -12,7 +14,21 @@ public class Bar {
 
     private Float rating;
 
+    private Long totalVotes;
+
     public Bar() {
+    }
+
+    public Bar(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -53,5 +69,13 @@ public class Bar {
 
     public void setRating(Float rating) {
         this.rating = rating;
+    }
+
+    public void setTotalVotes(Long totalVotes) {
+        this.totalVotes = totalVotes;
+    }
+
+    public Long getTotalVotes() {
+        return totalVotes;
     }
 }

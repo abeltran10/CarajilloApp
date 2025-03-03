@@ -2,8 +2,11 @@ package com.abeltran10.carajilloapp.data.repo;
 
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -60,22 +63,28 @@ public class BarRepository {
             QuerySnapshot querySnapshot = Tasks.await(q.get());
 
             if (querySnapshot.getDocuments().isEmpty()) {
+
+                QuerySnapshot querySnapshot1 = Tasks.await(bd.collection("bars").get());
+                String idBar = String.valueOf(querySnapshot1.getDocuments().size() + 1);
+
                 Map<String, Object> map = new HashMap<>();
+                map.put("id", idBar);
                 map.put("name", name);
                 map.put("address", address + " " + number);
                 map.put("city", city);
                 map.put("postalCode", postalCode);
                 map.put("rating", 0.0);
+                map.put("totalVotes", 0);
 
-                Tasks.await(bd.collection("bars").add(map));
+                Tasks.await(bd.collection("bars").document(idBar).set(map));
 
-                bar = new Bar();
+                bar = new Bar(idBar);
                 bar.setName(name);
                 bar.setAddress(address + " " + number);
                 bar.setCity(city);
                 bar.setPostalCode(postalCode);
-                bar.setRating((Float) map.get("rating"));
-
+                bar.setRating(Float.valueOf(map.get("rating").toString()));
+                bar.setTotalVotes(Long.valueOf(map.get("totalVotes").toString()));
                 setBar(bar);
 
                 result = new Result.Success<Bar>(this.bar);
@@ -89,5 +98,34 @@ public class BarRepository {
 
         return result;
 
+    }
+
+
+    public Result updateBar(Float averageResult, String idBar) {
+        Result result = null;
+        Map<String, Object> map = new HashMap<>();
+
+        try {
+            DocumentSnapshot documentSnapshot = Tasks.await(bd.collection("bars").document(idBar).get());
+            map.put("rating", averageResult);
+            map.put("totalVotes", documentSnapshot.getLong("totalVotes") + 1L);
+
+            Tasks.await(bd.collection("bars").document(idBar).update(map));
+
+            Bar bar = new Bar(idBar);
+            bar.setName(documentSnapshot.getString("name"));
+            bar.setCity(documentSnapshot.getString("city"));
+            bar.setAddress(documentSnapshot.getString("address"));
+            bar.setPostalCode(documentSnapshot.getString("postalCode"));
+            bar.setRating(averageResult);
+            bar.setTotalVotes((Long) map.get("totalVotes"));
+            setBar(bar);
+
+            result = new Result.Success<Bar>(this.bar);
+        } catch (ExecutionException | InterruptedException e) {
+            result = new Result.Error(new IOException("Ha hagut un problema al actualitzar la puntucació del bar"));
+        }
+
+        return result;
     }
 }
