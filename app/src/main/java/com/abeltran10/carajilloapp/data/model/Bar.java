@@ -23,6 +23,16 @@ public class Bar {
         this.id = id;
     }
 
+    public Bar(String id, String name, String city, String address, String postalCode, Float rating, Long totalVotes) {
+        this.id = id;
+        this.name = name;
+        this.city = city;
+        this.address = address;
+        this.postalCode = postalCode;
+        this.rating = rating;
+        this.totalVotes = totalVotes;
+    }
+
     public String getId() {
         return id;
     }

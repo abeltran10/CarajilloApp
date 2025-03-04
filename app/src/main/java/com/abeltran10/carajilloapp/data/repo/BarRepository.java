@@ -42,13 +42,6 @@ public class BarRepository {
         return instance;
     }
 
-    public Query getBarQuery() {
-        CollectionReference ref = bd.collection("bars");
-
-        return ref.orderBy("name", Query.Direction.ASCENDING);
-    }
-
-
     public Result createBar(String name, String address, String number, String city, String postalCode) {
         Result result = null;
         Bar bar = null;
