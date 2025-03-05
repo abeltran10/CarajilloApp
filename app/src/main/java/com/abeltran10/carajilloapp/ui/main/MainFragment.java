@@ -57,7 +57,7 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mainViewModel = new ViewModelProvider(this, new MainViewModelFactory())
+        mainViewModel = new ViewModelProvider(requireActivity(), new MainViewModelFactory())
                 .get(MainViewModel.class);
 
         Query query = bd.collection("bars").orderBy("name", Query.Direction.ASCENDING);;

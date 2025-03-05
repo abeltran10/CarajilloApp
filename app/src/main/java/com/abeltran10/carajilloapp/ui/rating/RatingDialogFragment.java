@@ -28,7 +28,7 @@ public class RatingDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        mainViewModel = new ViewModelProvider(this, new MainViewModelFactory())
+        mainViewModel = new ViewModelProvider(requireActivity(), new MainViewModelFactory())
                 .get(MainViewModel.class);
 
         LayoutInflater inflater = requireActivity().getLayoutInflater();
