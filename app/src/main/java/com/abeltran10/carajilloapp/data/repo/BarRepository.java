@@ -117,4 +117,16 @@ public class BarRepository {
         }
 
     }
+
+    public long totalBars() throws IOException {
+        AggregateQuerySnapshot aggregateQuerySnapshot = null;
+        try {
+            aggregateQuerySnapshot = Tasks.await(bd.collection("bars")
+                    .count().get(AggregateSource.SERVER));
+
+            return aggregateQuerySnapshot.getCount();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new IOException("No s'ha recuperat el nombre de bars");
+        }
+    }
 }
