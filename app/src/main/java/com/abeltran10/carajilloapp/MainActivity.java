@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setLogo(R.mipmap.ic_launcher_round);
 
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             if (mAuth.getCurrentUser() != null) {
                 getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
                         .add(R.id.frame_container, MainFragment.class, null)
@@ -32,8 +32,7 @@ public class MainActivity extends AppCompatActivity {
                         .add(R.id.frame_container, LoginFragment.class, null)
                         .commit();
             }
-
-
+        }
     }
 
 }
