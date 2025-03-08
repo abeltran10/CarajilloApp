@@ -1,24 +1,24 @@
-package com.abeltran10.carajilloapp.ui.rating;
+package com.abeltran10.carajilloapp.ui.main;
 
 import androidx.annotation.Nullable;
 
-public class RatingResult {
+public class MainResult {
 
     @Nullable
-    private RatingView success;
+    private MainView success;
     @Nullable
     private String error;
 
-    RatingResult(@Nullable String error) {
+    MainResult(@Nullable String error) {
         this.error = error;
     }
 
-    RatingResult(@Nullable RatingView success) {
+    MainResult(@Nullable MainView success) {
         this.success = success;
     }
 
     @Nullable
-    public RatingView getSuccess() {
+    public MainView getSuccess() {
         return success;
     }
 

@@ -12,18 +12,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.abeltran10.carajilloapp.data.model.City;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewHolder> {
     private OnItemClickListener listener;
 
+    private City city;
+
     public interface OnItemClickListener {
-        void onItemClick(Bar bar);
+        void onItemClick(Bar bar, City city);
     }
 
-    public MainAdapter(@NonNull FirestoreRecyclerOptions<Bar> options, OnItemClickListener listener) {
+    public MainAdapter(@NonNull FirestoreRecyclerOptions<Bar> options, City city, OnItemClickListener listener) {
         super(options);
+        this.city = city;
         this.listener = listener;
     }
 
@@ -75,11 +79,11 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder viewHolder, int position, @NonNull Bar bar) {
         viewHolder.getRestaurantName().setText(bar.getName().toUpperCase());
-        String location = bar.getCity().toUpperCase() + " - " + bar.getAddress().toUpperCase() + " (" + bar.getPostalCode() + ")";
+        String location = city.getName() + " - " + bar.getAddress() + " (" + bar.getPostalCode() + ")";
         viewHolder.getRestaurantLocation().setText(location);
         viewHolder.getRating().setRating(bar.getRating());
 
-        viewHolder.itemView.setOnClickListener(view -> listener.onItemClick(bar));
+        viewHolder.itemView.setOnClickListener(view -> listener.onItemClick(bar, city));
     }
 
     @NonNull

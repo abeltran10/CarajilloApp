@@ -2,13 +2,18 @@ package com.abeltran10.carajilloapp.data.repo;
 
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.abeltran10.carajilloapp.data.model.City;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,38 +43,30 @@ public class BarRepository {
         return instance;
     }
 
-    public Query getBarQuery() {
-        CollectionReference ref = bd.collection("bars");
-
-        return ref.orderBy("name", Query.Direction.ASCENDING);
-    }
-
-
-    public Result createBar(String name, String address, String number, String city, String postalCode) {
+    public Result createBar(String name, String address, City city, String postalCode) {
         Result result = null;
         Bar bar = null;
 
         name = name.toUpperCase();
-        address = address.toUpperCase();
-        city = city.toUpperCase();
 
         Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("name", name),
-                Filter.equalTo("address",address + " " + number),
-                Filter.equalTo("city", city), Filter.equalTo("postalCode", postalCode)));
+                Filter.equalTo("address", address),
+                Filter.equalTo("city", city.getId()), Filter.equalTo("postalCode", postalCode)));
 
         try {
             QuerySnapshot querySnapshot = Tasks.await(q.get());
 
             if (querySnapshot.getDocuments().isEmpty()) {
 
-                QuerySnapshot querySnapshot1 = Tasks.await(bd.collection("bars").get());
-                String idBar = String.valueOf(querySnapshot1.getDocuments().size() + 1);
+                AggregateQuerySnapshot aggregateQuerySnapshot = Tasks.await(bd.collection("bars")
+                        .count().get(AggregateSource.SERVER));
+                String idBar = String.valueOf(aggregateQuerySnapshot.getCount() + 1);
 
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", idBar);
                 map.put("name", name);
-                map.put("address", address + " " + number);
-                map.put("city", city);
+                map.put("address", address);
+                map.put("city", city.getId());
                 map.put("postalCode", postalCode);
                 map.put("rating", 0.0);
                 map.put("totalVotes", 0);
@@ -78,11 +75,11 @@ public class BarRepository {
 
                 bar = new Bar(idBar);
                 bar.setName(name);
-                bar.setAddress(address + " " + number);
-                bar.setCity(city);
+                bar.setAddress(address);
+                bar.setCity(city.getId());
                 bar.setPostalCode(postalCode);
-                bar.setRating(Float.valueOf(map.get("rating").toString()));
-                bar.setTotalVotes(Long.valueOf(map.get("totalVotes").toString()));
+                bar.setRating(((Number)map.get("rating")).floatValue());
+                bar.setTotalVotes(((Number)map.get("totalVotes")).longValue());
                 setBar(bar);
 
                 result = new Result.Success<Bar>(this.bar);
@@ -99,31 +96,38 @@ public class BarRepository {
     }
 
 
-    public Result updateBar(Float averageResult, String idBar) {
-        Result result = null;
+    public void updateBar(Transaction transaction, Float averageResult, String idBar) throws IOException {
         Map<String, Object> map = new HashMap<>();
 
         try {
             DocumentSnapshot documentSnapshot = Tasks.await(bd.collection("bars").document(idBar).get());
+            map.put("name", documentSnapshot.getString("name"));
+            map.put("city", documentSnapshot.getString("city"));
+            map.put("address", documentSnapshot.getString("address"));
+            map.put("postalCode", documentSnapshot.getString("postalCode"));
             map.put("rating", averageResult);
             map.put("totalVotes", documentSnapshot.getLong("totalVotes") + 1L);
 
-            Tasks.await(bd.collection("bars").document(idBar).update(map));
+            DocumentReference documentReference = bd.collection("bars").document(idBar);
+            transaction.set(documentReference, map);
 
-            Bar bar = new Bar(idBar);
-            bar.setName(documentSnapshot.getString("name"));
-            bar.setCity(documentSnapshot.getString("city"));
-            bar.setAddress(documentSnapshot.getString("address"));
-            bar.setPostalCode(documentSnapshot.getString("postalCode"));
-            bar.setRating(averageResult);
-            bar.setTotalVotes((Long) map.get("totalVotes"));
-            setBar(bar);
-
-            result = new Result.Success<Bar>(this.bar);
         } catch (ExecutionException | InterruptedException e) {
-            result = new Result.Error(new IOException("Ha hagut un problema al actualitzar la puntucació del bar"));
+            throw new IOException("Ha hagut un problema al actualitzar la puntucació del bar");
         }
 
-        return result;
+    }
+
+    public long totalBars(String cityId) throws IOException {
+        AggregateQuerySnapshot aggregateQuerySnapshot = null;
+        try {
+            CollectionReference collectionReference = bd.collection("bars");
+
+            aggregateQuerySnapshot = Tasks.await(collectionReference.where(Filter.equalTo("city", cityId))
+                    .count().get(AggregateSource.SERVER));
+
+            return aggregateQuerySnapshot.getCount();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new IOException("No s'ha recuperat el nombre de bars");
+        }
     }
 }

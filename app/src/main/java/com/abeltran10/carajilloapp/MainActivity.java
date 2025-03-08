@@ -6,8 +6,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.abeltran10.carajilloapp.ui.cities.CitiesFragment;
 import com.abeltran10.carajilloapp.ui.login.LoginFragment;
-import com.abeltran10.carajilloapp.ui.main.MainFragment;
 import com.google.firebase.auth.FirebaseAuth;
 
 
@@ -22,18 +22,17 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setLogo(R.mipmap.ic_launcher_round);
 
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             if (mAuth.getCurrentUser() != null) {
                 getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
-                        .add(R.id.frame_container, MainFragment.class, null)
+                        .add(R.id.frame_container, CitiesFragment.class, null)
                         .commit();
             } else {
                 getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
                         .add(R.id.frame_container, LoginFragment.class, null)
                         .commit();
             }
-
-
+        }
     }
 
 }

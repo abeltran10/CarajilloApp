@@ -19,10 +19,10 @@ public class LocationServiceImpl implements LocationService {
 
 
     @Override
-    public Result addressExists(String address, String number, String postalCode, String city) {
+    public Result addressExists(String address, String postalCode, String city) {
         OkHttpClient client = new OkHttpClient();
 
-        String formatedAddress = address.replace(" ", "%20") + "+" + number + "%2C+" +
+        String formatedAddress = address.replace(" ", "%20") + "%2C+" +
                 postalCode + "+" + city.replace(" ", "%20") + "%2C+" + "Spain";
 
 
@@ -34,7 +34,7 @@ public class LocationServiceImpl implements LocationService {
                     .build();
 
             Response response = client.newCall(request).execute();
-
+            String street = null;
             if (response.isSuccessful()) {
                 String responseBody = (response.body() != null) ? response.body().string() : null;
 
@@ -42,12 +42,26 @@ public class LocationServiceImpl implements LocationService {
                 int totalResults = json.getInt("total_results");
 
                 // si recupera adreça i còdi postal com a mínim
-                boolean exists =  totalResults >= 2;
+                if (totalResults >= 2) {
+                    JSONObject result1 = (JSONObject) json.getJSONArray("results").get(0);
+                    street = result1.getJSONObject("components").getString("road");
 
-                return new Result.Success<Boolean>(exists);
+                    if (street.indexOf("Calle ") != -1) {
+                        street = street.substring(street.indexOf("Calle "));
+                        street = "Carrer " + street;
+                    } else if (street.indexOf("Plaza ") != -1) {
+                        street.substring(street.indexOf("Plaza "));
+                        street = "Plaça " + street;
+                    } else if (street.indexOf("Avenida ") != -1) {
+                        street.substring(street.indexOf("Avenida "));
+                        street = "Avinguda " + street;
+                    }
+
+                }
+
             }
 
-            return new Result.Success<Boolean>(false);
+            return new Result.Success<String>(street);
         } catch (IOException | IllegalStateException | JSONException ex) {
             return new Result.Error(new Exception("Ha hagut un problema i no s'ha pogut validar l'adreça"));
         }

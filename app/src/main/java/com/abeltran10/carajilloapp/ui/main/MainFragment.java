@@ -9,32 +9,30 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.databinding.FragmentMainBinding;
 import com.abeltran10.carajilloapp.ui.bar.BarFragment;
 import com.abeltran10.carajilloapp.ui.rating.RatingDialogFragment;
-import com.abeltran10.carajilloapp.ui.rating.RatingDialogViewModel;
-import com.abeltran10.carajilloapp.ui.rating.RatingDialogViewModelFactory;
-import com.abeltran10.carajilloapp.ui.rating.RatingResult;
-import com.abeltran10.carajilloapp.ui.rating.RatingView;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 public class MainFragment extends Fragment {
 
     private FragmentMainBinding binding;
 
-    private RatingDialogViewModel ratingDialogViewModel;
-
     private MainViewModel mainViewModel;
 
     private MainAdapter mainAdapter;
+
+    private FirebaseFirestore bd = FirebaseFirestore.getInstance();
 
 
 
@@ -59,18 +57,28 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mainViewModel = new ViewModelProvider(this, new MainViewModelFactory())
+        mainViewModel = new ViewModelProvider(requireActivity(), new MainViewModelFactory())
                 .get(MainViewModel.class);
 
+        City city = new City();
+        if (getArguments() != null) {
+            city.setId(getArguments().getString("cityId"));
+            city.setName(getArguments().getString("cityName"));
+        }
+        Query query = bd.collection("bars").orderBy("name", Query.Direction.ASCENDING);;
         FirestoreRecyclerOptions<Bar> options = new FirestoreRecyclerOptions.Builder<Bar>()
-                .setQuery(mainViewModel.getBarQuery(), Bar.class)
+                .setQuery(query, Bar.class)
                 .build();
 
-        mainAdapter = new MainAdapter(options, (bar) -> {
+        mainAdapter = new MainAdapter(options, city, (bar, c) -> {
             if (getContext() != null && getContext().getApplicationContext() != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString("id", bar.getId());
                 bundle.putString("name", bar.getName());
+                bundle.putString("cityId", c.getId());
+                bundle.putString("cityName", c.getName());
+                bundle.putString("address", bar.getAddress());
+                bundle.putString("postalCode", bar.getPostalCode());
                 bundle.putFloat("rating", bar.getRating());
                 bundle.putLong("totalVotes", bar.getTotalVotes());
 
@@ -88,34 +96,31 @@ public class MainFragment extends Fragment {
         FloatingActionButton fab = binding.floatingButton;
         fab.setOnClickListener(view1 -> {
             if (getContext() != null && getContext().getApplicationContext() != null) {
+                Bundle bundle = new Bundle();
+                bundle.putString("cityId", city.getId());
+                bundle.putString("cityName", city.getName());
+
                 requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
-                        .replace(R.id.frame_container, BarFragment.class, null)
+                        .replace(R.id.frame_container, BarFragment.class, bundle)
                         .addToBackStack("main")
                         .commit();
             }
         });
 
-
-        ratingDialogViewModel = new ViewModelProvider(requireActivity(), new RatingDialogViewModelFactory())
-                .get(RatingDialogViewModel.class);
-
-        ratingDialogViewModel.getRatingResult().observe(getViewLifecycleOwner(), new Observer<RatingResult>() {
-            @Override
-            public void onChanged(RatingResult ratingResult) {
-                if (ratingResult.getError() != null) {
-                    showRatingError(ratingResult.getError());
-                }
-                if (ratingResult.getSuccess() != null) {
-                    showRatingSuccess(ratingResult.getSuccess());
-                }
+        mainViewModel.getMainResult().observe(getViewLifecycleOwner(), mainResult -> {
+            if (mainResult.getError() != null) {
+                showMainError(mainResult.getError());
+            }
+            if (mainResult.getSuccess() != null) {
+                showMainSuccess(mainResult.getSuccess());
             }
         });
 
     }
 
-    private void showRatingSuccess(RatingView success) {
+    private void showMainSuccess(MainView success) {
         if (getContext() != null && getContext().getApplicationContext() != null) {
-            String message = "Has puntuat " + success.getBarName() + " amb " + success.getRating().toString()
+            String message = "Has puntuat " + success.getBar().getName() + " amb " + success.getRating().toString()
                     + " punts";
 
             Toast.makeText(
@@ -125,7 +130,7 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void showRatingError(String error) {
+    private void showMainError(String error) {
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(
                     getContext().getApplicationContext(),
