@@ -2,6 +2,7 @@ package com.abeltran10.carajilloapp.data.repo;
 
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.abeltran10.carajilloapp.data.model.City;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.AggregateQuerySnapshot;
 import com.google.firebase.firestore.AggregateSource;
@@ -42,17 +43,15 @@ public class BarRepository {
         return instance;
     }
 
-    public Result createBar(String name, String address, String number, String city, String postalCode) {
+    public Result createBar(String name, String address, City city, String postalCode) {
         Result result = null;
         Bar bar = null;
 
         name = name.toUpperCase();
-        address = address.toUpperCase();
-        city = city.toUpperCase();
 
         Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("name", name),
-                Filter.equalTo("address",address + " " + number),
-                Filter.equalTo("city", city), Filter.equalTo("postalCode", postalCode)));
+                Filter.equalTo("address", address),
+                Filter.equalTo("city", city.getId()), Filter.equalTo("postalCode", postalCode)));
 
         try {
             QuerySnapshot querySnapshot = Tasks.await(q.get());
@@ -66,8 +65,8 @@ public class BarRepository {
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", idBar);
                 map.put("name", name);
-                map.put("address", address + " " + number);
-                map.put("city", city);
+                map.put("address", address);
+                map.put("city", city.getId());
                 map.put("postalCode", postalCode);
                 map.put("rating", 0.0);
                 map.put("totalVotes", 0);
@@ -76,8 +75,8 @@ public class BarRepository {
 
                 bar = new Bar(idBar);
                 bar.setName(name);
-                bar.setAddress(address + " " + number);
-                bar.setCity(city);
+                bar.setAddress(address);
+                bar.setCity(city.getId());
                 bar.setPostalCode(postalCode);
                 bar.setRating(((Number)map.get("rating")).floatValue());
                 bar.setTotalVotes(((Number)map.get("totalVotes")).longValue());
@@ -118,10 +117,12 @@ public class BarRepository {
 
     }
 
-    public long totalBars() throws IOException {
+    public long totalBars(String cityId) throws IOException {
         AggregateQuerySnapshot aggregateQuerySnapshot = null;
         try {
-            aggregateQuerySnapshot = Tasks.await(bd.collection("bars")
+            CollectionReference collectionReference = bd.collection("bars");
+
+            aggregateQuerySnapshot = Tasks.await(collectionReference.where(Filter.equalTo("city", cityId))
                     .count().get(AggregateSource.SERVER));
 
             return aggregateQuerySnapshot.getCount();

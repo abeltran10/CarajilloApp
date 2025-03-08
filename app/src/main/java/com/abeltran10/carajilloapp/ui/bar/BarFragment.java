@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.abeltran10.carajilloapp.R;
+import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.databinding.FragmentBarBinding;
 import com.abeltran10.carajilloapp.ui.main.MainFragment;
 
@@ -57,13 +58,21 @@ public class BarFragment extends Fragment {
 
         barViewModel = new ViewModelProvider(this, new BarViewModelFactory()).get(BarViewModel.class);
 
+        City city = new City();
+        if (getArguments() != null) {
+            city.setId(getArguments().getString("cityId"));
+            city.setName(getArguments().getString("cityName"));
+        }
+
         ProgressBar loadingBar = binding.loadingBar;
         EditText barName = binding.barName;
         EditText barCity = binding.barCity;
         EditText barAddress = binding.barAddress;
-        EditText barNumber = binding.barNumber;
         EditText barPostalCode = binding.barPostalCode;
         Button barCreate = binding.createBar;
+
+        barCity.setText(city.getName());
+        barCity.setEnabled(false);
 
         barViewModel.getBarResult().observe(getViewLifecycleOwner(), new Observer<BarResult>() {
             @Override
@@ -79,7 +88,7 @@ public class BarFragment extends Fragment {
                 }
 
                 if (barResult.getSuccess() != null) {
-                    updateUI(barResult.getSuccess());
+                    updateUI(barResult.getSuccess(), city);
                 }
 
             }
@@ -89,6 +98,19 @@ public class BarFragment extends Fragment {
             @Override
             public void onChanged(BarFormState barFormState) {
                 barCreate.setEnabled(barFormState.isDataValid());
+
+                if (barFormState.getNameError() != null) {
+                    barName.setError(getString(barFormState.getNameError()));
+                }
+
+                if (barFormState.getAddressError() != null) {
+                    barAddress.setError(getString(barFormState.getAddressError()));
+                }
+
+                if (barFormState.getPostalCodeError() != null) {
+                    barPostalCode.setError(getString(barFormState.getPostalCodeError()));
+                }
+
             }
         });
 
@@ -106,14 +128,13 @@ public class BarFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 barViewModel.barDataChanged(barName.getText().toString(),
-                        barAddress.getText().toString(), barNumber.getText().toString(),
+                        barAddress.getText().toString(),
                         barCity.getText().toString(), barPostalCode.getText().toString());
             }
         };
 
         barName.addTextChangedListener(afterTextChangedListener);
         barAddress.addTextChangedListener(afterTextChangedListener);
-        barNumber.addTextChangedListener(afterTextChangedListener);
         barCity.addTextChangedListener(afterTextChangedListener);
         barPostalCode.addTextChangedListener(afterTextChangedListener);
 
@@ -122,23 +143,27 @@ public class BarFragment extends Fragment {
             public void onClick(View v) {
                 loadingBar.setVisibility(View.VISIBLE);
                 barViewModel.create(barName.getText().toString(),
-                        barAddress.getText().toString(), barNumber.getText().toString(),
-                        barCity.getText().toString(), barPostalCode.getText().toString());
+                        barAddress.getText().toString(),
+                        city, barPostalCode.getText().toString());
             }
         });
     }
 
 
 
-    private void updateUI(BarView success) {
+    private void updateUI(BarView success,City city) {
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(
                     getContext().getApplicationContext(),
                     "Bar: " + success.getName().toUpperCase() + " afegit amb exit.",
                     Toast.LENGTH_LONG).show();
 
+            Bundle bundle = new Bundle();
+            bundle.putString("cityId", city.getId());
+            bundle.putString("cityName", city.getName());
+
             requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
-                    .replace(R.id.frame_container, MainFragment.class, null)
+                    .replace(R.id.frame_container, MainFragment.class, bundle)
                     .commit();
         }
     }

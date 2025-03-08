@@ -79,7 +79,7 @@ public class CityAdapter extends FirestoreRecyclerAdapter<City, CityAdapter.View
 
         executorService.execute(() -> {
             try {
-                long totalBars =  barRepository.totalBars();
+                long totalBars =  barRepository.totalBars(city.getId());
                 viewHolder.getTotalBars().setText(totalBars + " " + "bars");
             } catch (IOException e) {
                 viewHolder.getTotalBars().setText(e.getMessage());

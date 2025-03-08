@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.service.LocationService;
 import com.abeltran10.carajilloapp.data.service.LocationServiceImpl;
@@ -34,15 +35,15 @@ public class BarViewModel extends ViewModel {
         return barFormState;
     }
 
-    public void create(String name, String address, String number, String city, String postalCode) {
+    public void create(String name, String address, City city, String postalCode) {
         executorService.execute(() -> {
 
-            Result locationResult = locationService.addressExists(address, number, postalCode, city);
+            Result locationResult = locationService.addressExists(address, postalCode, city.getName());
             if (locationResult instanceof Result.Success) {
-                Boolean addressExists = ((Result.Success<Boolean>)locationResult).getData();
+                String street = ((Result.Success<String>)locationResult).getData();
 
-                if (addressExists) {
-                    Result repositoryResult = barRepository.createBar(name, address, number, city, postalCode);
+                if (street != null) {
+                    Result repositoryResult = barRepository.createBar(name, street, city, postalCode);
                     if (repositoryResult instanceof Result.Success) {
                         Bar data = ((Result.Success<Bar>) repositoryResult).getData();
                         barResult.postValue(new BarResult(new BarView(data.getName(), data.getAddress(),
@@ -61,14 +62,14 @@ public class BarViewModel extends ViewModel {
 
     }
 
-    public void barDataChanged(String name, String address, String number, String city, String postalCode) {
-        if (isNameValid(name) && isAddressValid(address) && isNumberValid(number) && isCityValid(city)
+    public void barDataChanged(String name, String address, String city, String postalCode) {
+        if (isNameValid(name) && isAddressValid(address) && isCityValid(city)
                 && isPostalCodeValid(postalCode)) {
             barFormState.setValue(new BarFormState(true));
-        } else if (!isPostalCodeValid(postalCode)) {
-            barFormState.setValue(new BarFormState(R.string.invalid_postal_code));
-        } else if (!isNumberValid(number)) {
-            barFormState.setValue(new BarFormState(R.string.invalid_number));
+        } else if (!isAddressValid(address)) {
+            barFormState.setValue(new BarFormState(null, R.string.invalid_address, null));
+        }else if (!isPostalCodeValid(postalCode)) {
+            barFormState.setValue(new BarFormState(null, null, R.string.invalid_postal_code));
         }
     }
 
@@ -77,11 +78,7 @@ public class BarViewModel extends ViewModel {
     }
 
     private boolean isAddressValid(String address) {
-        return address != null && !address.trim().isEmpty();
-    }
-
-    private boolean isNumberValid(String number) {
-        return number != null && !number.trim().isEmpty() && number.matches("[0-9]*");
+        return address != null && !address.trim().isEmpty() && address.matches("^[^0-9]+$");
     }
 
     private boolean isCityValid(String city) {

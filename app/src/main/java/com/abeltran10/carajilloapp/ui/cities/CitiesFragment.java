@@ -60,8 +60,12 @@ public class CitiesFragment extends Fragment {
 
         cityAdapter = new CityAdapter(options, (city) -> {
             if (getContext() != null && getContext().getApplicationContext() != null) {
+                Bundle bundle = new Bundle();
+                bundle.putString("cityId", city.getId());
+                bundle.putString("cityName", city.getName());
+
                 requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
-                        .replace(R.id.frame_container, MainFragment.class, null)
+                        .replace(R.id.frame_container, MainFragment.class, bundle)
                         .addToBackStack("cities")
                         .commit();
             }

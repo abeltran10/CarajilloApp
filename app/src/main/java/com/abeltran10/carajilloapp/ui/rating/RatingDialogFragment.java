@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.ui.main.MainViewModel;
 import com.abeltran10.carajilloapp.ui.main.MainViewModelFactory;
 
@@ -41,13 +42,18 @@ public class RatingDialogFragment extends DialogFragment {
         if (getArguments() != null) {
             String idBar = getArguments().getString("id");
             String name = getArguments().getString("name");
-            String city = getArguments().getString("city");
+            String cityId = getArguments().getString("cityId");
+            String cityName = getArguments().getString("cityName");
             String address = getArguments().getString("address");
             String postalCode = getArguments().getString("postalCode");
             Float rating = getArguments().getFloat("rating");
             Long totalVotes = getArguments().getLong("totalVotes");
 
-            Bar bar = new Bar(idBar, name, city, address, postalCode, rating, totalVotes);
+            City city = new City();
+            city.setId(cityId);
+            city.setName(cityName);
+
+            Bar bar = new Bar(idBar, name, city.getId(), address, postalCode, rating, totalVotes);
 
             builder.setTitle(name);
             builder.setView(view);
