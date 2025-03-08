@@ -162,9 +162,7 @@ public class BarFragment extends Fragment {
             bundle.putString("cityId", city.getId());
             bundle.putString("cityName", city.getName());
 
-            requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
-                    .replace(R.id.frame_container, MainFragment.class, bundle)
-                    .commit();
+            requireActivity().getSupportFragmentManager().popBackStack();
         }
     }
 
