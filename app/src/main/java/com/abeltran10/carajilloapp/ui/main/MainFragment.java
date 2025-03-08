@@ -21,6 +21,7 @@ import com.abeltran10.carajilloapp.ui.bar.BarFragment;
 import com.abeltran10.carajilloapp.ui.rating.RatingDialogFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -65,7 +66,8 @@ public class MainFragment extends Fragment {
             city.setId(getArguments().getString("cityId"));
             city.setName(getArguments().getString("cityName"));
         }
-        Query query = bd.collection("bars").orderBy("name", Query.Direction.ASCENDING);;
+        Query query = bd.collection("bars").where(Filter.equalTo("city", city.getId()))
+                .orderBy("name", Query.Direction.ASCENDING);;
         FirestoreRecyclerOptions<Bar> options = new FirestoreRecyclerOptions.Builder<Bar>()
                 .setQuery(query, Bar.class)
                 .build();
