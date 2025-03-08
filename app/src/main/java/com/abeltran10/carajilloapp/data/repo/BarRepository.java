@@ -49,9 +49,9 @@ public class BarRepository {
 
         name = name.toUpperCase();
 
-        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("name", name),
-                Filter.equalTo("address", address),
-                Filter.equalTo("city", city.getId()), Filter.equalTo("postalCode", postalCode)));
+        Query q = bd.collection("bars").whereEqualTo("name", name)
+                .whereEqualTo("address", address)
+                .whereEqualTo("city", city.getId());
 
         try {
             QuerySnapshot querySnapshot = Tasks.await(q.get());

@@ -66,8 +66,12 @@ public class MainFragment extends Fragment {
             city.setId(getArguments().getString("cityId"));
             city.setName(getArguments().getString("cityName"));
         }
-        Query query = bd.collection("bars").where(Filter.equalTo("city", city.getId()))
-                .orderBy("name", Query.Direction.ASCENDING);;
+
+        Query query = bd.collection("bars")
+                .whereEqualTo("city", city.getId())
+                .orderBy("name", Query.Direction.ASCENDING);
+
+
         FirestoreRecyclerOptions<Bar> options = new FirestoreRecyclerOptions.Builder<Bar>()
                 .setQuery(query, Bar.class)
                 .build();
