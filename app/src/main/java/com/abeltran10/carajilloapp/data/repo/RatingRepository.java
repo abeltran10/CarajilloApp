@@ -1,6 +1,5 @@
 package com.abeltran10.carajilloapp.data.repo;
 
-import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Rating;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;

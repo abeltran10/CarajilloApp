@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.databinding.FragmentLoginBinding;
 import com.abeltran10.carajilloapp.ui.cities.CitiesFragment;
-import com.abeltran10.carajilloapp.ui.main.MainFragment;
 import com.abeltran10.carajilloapp.ui.register.RegisterFragment;
 
 public class LoginFragment extends Fragment {

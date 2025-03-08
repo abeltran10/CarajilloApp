@@ -8,7 +8,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.abeltran10.carajilloapp.ui.cities.CitiesFragment;
 import com.abeltran10.carajilloapp.ui.login.LoginFragment;
-import com.abeltran10.carajilloapp.ui.main.MainFragment;
 import com.google.firebase.auth.FirebaseAuth;
 
 

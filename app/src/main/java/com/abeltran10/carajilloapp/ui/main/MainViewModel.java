@@ -4,12 +4,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.abeltran10.carajilloapp.data.model.Bar;
-import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.repo.CitiesRepository;
 import com.abeltran10.carajilloapp.data.repo.RatingRepository;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
