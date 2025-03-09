@@ -13,6 +13,7 @@ import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Source;
 import com.google.firebase.firestore.Transaction;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class BarRepository {
                 .whereEqualTo("city", city.getId());
 
         try {
-            QuerySnapshot querySnapshot = Tasks.await(q.get());
+            QuerySnapshot querySnapshot = Tasks.await(q.get(Source.SERVER));
 
             if (querySnapshot.getDocuments().isEmpty()) {
 
