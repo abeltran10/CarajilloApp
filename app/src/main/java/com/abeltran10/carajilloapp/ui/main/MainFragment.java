@@ -67,16 +67,7 @@ public class MainFragment extends Fragment {
             city.setName(getArguments().getString("cityName"));
         }
 
-        Query query = bd.collection("bars")
-                .whereEqualTo("city", city.getId())
-                .orderBy("name", Query.Direction.ASCENDING);
-
-
-        FirestoreRecyclerOptions<Bar> options = new FirestoreRecyclerOptions.Builder<Bar>()
-                .setQuery(query, Bar.class)
-                .build();
-
-        mainAdapter = new MainAdapter(options, city, (bar, c) -> {
+        mainAdapter = new MainAdapter(mainViewModel.getBarsOptions(city), city, (bar, c) -> {
             if (getContext() != null && getContext().getApplicationContext() != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString("id", bar.getId());

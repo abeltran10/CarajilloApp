@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel;
 
 import com.abeltran10.carajilloapp.data.EventWrapper;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.repo.CitiesRepository;
 import com.abeltran10.carajilloapp.data.repo.RatingRepository;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +39,16 @@ public class MainViewModel extends ViewModel {
 
     public MutableLiveData<EventWrapper<MainResult>> getMainResult() {
         return mainResult;
+    }
+
+    public FirestoreRecyclerOptions<Bar> getBarsOptions(City city) {
+        Query query = bd.collection("bars")
+                .whereEqualTo("city", city.getId())
+                .orderBy("name", Query.Direction.ASCENDING);
+
+        return new FirestoreRecyclerOptions.Builder<Bar>()
+                .setQuery(query, Bar.class)
+                .build();
     }
 
     public void vote(Float newRating, Bar bar) {

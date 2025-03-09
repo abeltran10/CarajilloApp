@@ -49,12 +49,9 @@ public class CitiesFragment extends Fragment {
         citiesViewModel = new ViewModelProvider(this, new CitiesViewModelFactory())
                 .get(CitiesViewModel.class);
 
-        Query query = bd.collection("cities").orderBy("name", Query.Direction.ASCENDING);;
-        FirestoreRecyclerOptions<City> options = new FirestoreRecyclerOptions.Builder<City>()
-                .setQuery(query, City.class)
-                .build();
 
-        cityAdapter = new CityAdapter(options, (city) -> {
+
+        cityAdapter = new CityAdapter(citiesViewModel.getCitiesOptions(), (city) -> {
             if (getContext() != null && getContext().getApplicationContext() != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString("cityId", city.getId());

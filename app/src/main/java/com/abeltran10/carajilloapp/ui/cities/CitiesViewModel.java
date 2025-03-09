@@ -2,13 +2,24 @@ package com.abeltran10.carajilloapp.ui.cities;
 
 import androidx.lifecycle.ViewModel;
 
+import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.data.repo.CitiesRepository;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 public class CitiesViewModel extends ViewModel {
 
     private CitiesRepository citiesRepository;
 
+    private FirebaseFirestore bd = FirebaseFirestore.getInstance();
+
     public CitiesViewModel(CitiesRepository citiesRepository) {
         this.citiesRepository = citiesRepository;
+    }
+
+    public FirestoreRecyclerOptions<City> getCitiesOptions() {
+        Query query = bd.collection("cities").orderBy("name", Query.Direction.ASCENDING);;
+        return new FirestoreRecyclerOptions.Builder<City>().setQuery(query, City.class).build();
     }
 }
