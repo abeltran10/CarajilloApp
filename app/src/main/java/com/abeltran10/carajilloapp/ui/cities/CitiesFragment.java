@@ -28,8 +28,6 @@ public class CitiesFragment extends Fragment {
 
     private CityAdapter cityAdapter;
 
-    private FirebaseFirestore bd = FirebaseFirestore.getInstance();
-
     public static CitiesFragment newInstance() {
         return new CitiesFragment();
     }

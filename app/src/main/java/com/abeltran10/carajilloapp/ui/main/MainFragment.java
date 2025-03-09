@@ -33,9 +33,6 @@ public class MainFragment extends Fragment {
 
     private MainAdapter mainAdapter;
 
-    private FirebaseFirestore bd = FirebaseFirestore.getInstance();
-
-
 
     public static MainFragment newInstance() {
         return new MainFragment();
