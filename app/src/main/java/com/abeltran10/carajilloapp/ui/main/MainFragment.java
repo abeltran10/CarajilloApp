@@ -113,11 +113,13 @@ public class MainFragment extends Fragment {
             }
         });
 
-        mainViewModel.getMainResult().observe(getViewLifecycleOwner(), mainResult -> {
-            if (mainResult.getError() != null) {
+        mainViewModel.getMainResult().observe(getViewLifecycleOwner(), eventWrapper -> {
+            MainResult mainResult = eventWrapper.getContentIfNotHandled();
+
+            if (mainResult != null && mainResult.getError() != null) {
                 showMainError(mainResult.getError());
             }
-            if (mainResult.getSuccess() != null) {
+            if (mainResult != null && mainResult.getSuccess() != null) {
                 showMainSuccess(mainResult.getSuccess());
             }
         });

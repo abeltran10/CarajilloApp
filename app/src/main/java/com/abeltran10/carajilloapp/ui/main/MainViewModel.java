@@ -3,6 +3,7 @@ package com.abeltran10.carajilloapp.ui.main;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.abeltran10.carajilloapp.data.EventWrapper;
 import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.repo.CitiesRepository;
@@ -24,7 +25,7 @@ public class MainViewModel extends ViewModel {
 
     private FirebaseFirestore bd = FirebaseFirestore.getInstance();
 
-    private MutableLiveData<MainResult> mainResult = new MutableLiveData<>();
+    private MutableLiveData<EventWrapper<MainResult>> mainResult = new MutableLiveData<>();
 
 
     public MainViewModel(BarRepository barRepository, RatingRepository ratingRepository, CitiesRepository citiesRepository) {
@@ -33,7 +34,7 @@ public class MainViewModel extends ViewModel {
         this.citiesRepository = citiesRepository;
     }
 
-    public MutableLiveData<MainResult> getMainResult() {
+    public MutableLiveData<EventWrapper<MainResult>> getMainResult() {
         return mainResult;
     }
 
@@ -51,9 +52,9 @@ public class MainViewModel extends ViewModel {
 
             return null;
         }).addOnSuccessListener(aVoid -> {
-            mainResult.postValue(new MainResult(new MainView(newRating, bar)));
+            mainResult.postValue(new EventWrapper(new MainResult(new MainView(newRating, bar))));
         }).addOnFailureListener(e -> {
-            mainResult.postValue(new MainResult(e.getMessage()));
+            mainResult.postValue(new EventWrapper(new MainResult(e.getMessage())));
         });
 
     }
