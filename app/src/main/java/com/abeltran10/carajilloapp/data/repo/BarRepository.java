@@ -103,6 +103,8 @@ public class BarRepository {
 
         try {
             DocumentSnapshot documentSnapshot = Tasks.await(bd.collection("bars").document(idBar).get());
+
+            map.put("id", documentSnapshot.getString("id"));
             map.put("name", documentSnapshot.getString("name"));
             map.put("city", documentSnapshot.getString("city"));
             map.put("address", documentSnapshot.getString("address"));

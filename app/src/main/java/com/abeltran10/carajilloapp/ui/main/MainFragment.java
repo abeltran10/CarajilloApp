@@ -64,7 +64,9 @@ public class MainFragment extends Fragment {
             city.setName(getArguments().getString("cityName"));
         }
 
-        mainAdapter = new MainAdapter(mainViewModel.getBarsOptions(city), city, (bar, c) -> {
+        mainAdapter = new MainAdapter(mainViewModel.getBarsOptions(city), city);
+
+        mainAdapter.setOnItemClickListener((bar, c) -> {
             if (getContext() != null && getContext().getApplicationContext() != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString("id", bar.getId());

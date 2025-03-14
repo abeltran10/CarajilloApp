@@ -17,7 +17,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewHolder> {
-    private OnItemClickListener listener;
+    private OnItemClickListener onItemClickListener;
 
     private City city;
 
@@ -25,10 +25,13 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
         void onItemClick(Bar bar, City city);
     }
 
-    public MainAdapter(@NonNull FirestoreRecyclerOptions<Bar> options, City city, OnItemClickListener listener) {
+    public MainAdapter(@NonNull FirestoreRecyclerOptions<Bar> options, City city) {
         super(options);
         this.city = city;
-        this.listener = listener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
 
@@ -83,7 +86,7 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
         viewHolder.getRestaurantLocation().setText(location);
         viewHolder.getRating().setRating(bar.getRating());
 
-        viewHolder.itemView.setOnClickListener(view -> listener.onItemClick(bar, city));
+        viewHolder.itemView.setOnClickListener(view -> onItemClickListener.onItemClick(bar, city));
     }
 
     @NonNull
