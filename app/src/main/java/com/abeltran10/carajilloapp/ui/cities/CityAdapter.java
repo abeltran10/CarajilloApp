@@ -11,28 +11,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.model.City;
-import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class CityAdapter extends FirestoreRecyclerAdapter<City, CityAdapter.ViewHolder> {
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private CityAdapter.OnItemClickListener onItemClickListener;
 
-    private BarRepository barRepository = BarRepository.getInstance();
-
-    private CityAdapter.OnItemClickListener listener;
+    private CityAdapter.OnBindTotalBars onBindTotalBars;
 
     public interface OnItemClickListener {
         void onItemClick(City city);
     }
 
-    public CityAdapter(@NonNull FirestoreRecyclerOptions<City> options, CityAdapter.OnItemClickListener listener) {
+    public interface OnBindTotalBars {
+        void setTotalBars(CityAdapter.ViewHolder viewHolder, City city);
+    }
+
+    public CityAdapter(@NonNull FirestoreRecyclerOptions<City> options, CityAdapter.OnBindTotalBars onBindTotalBars) {
         super(options);
-        this.listener = listener;
+        this.onBindTotalBars = onBindTotalBars;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -73,16 +74,9 @@ public class CityAdapter extends FirestoreRecyclerAdapter<City, CityAdapter.View
     protected void onBindViewHolder(@NonNull CityAdapter.ViewHolder viewHolder, int position, @NonNull City city) {
         viewHolder.getCityName().setText(city.getName());
 
-        executorService.execute(() -> {
-            try {
-                long totalBars =  barRepository.totalBars(city.getId());
-                viewHolder.getTotalBars().setText(totalBars + " " + "bars");
-            } catch (IOException e) {
-                viewHolder.getTotalBars().setText(e.getMessage());
-            }
-        });
+        onBindTotalBars.setTotalBars(viewHolder, city);
 
-        viewHolder.itemView.setOnClickListener(view -> listener.onItemClick(city));
+        viewHolder.itemView.setOnClickListener(view -> onItemClickListener.onItemClick(city));
     }
 
 

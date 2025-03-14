@@ -17,6 +17,10 @@ import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.databinding.FragmentCitiesBinding;
 import com.abeltran10.carajilloapp.ui.main.MainFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -47,9 +51,17 @@ public class CitiesFragment extends Fragment {
         citiesViewModel = new ViewModelProvider(this, new CitiesViewModelFactory())
                 .get(CitiesViewModel.class);
 
+        cityAdapter = new CityAdapter(citiesViewModel.getCitiesOptions(), (viewHolder, city) ->
+                citiesViewModel.getTotalBarsByCity(city.getId())
+                .get(AggregateSource.SERVER)
+                .addOnSuccessListener(aggregateQuerySnapshot ->
+                   viewHolder.getTotalBars().setText(aggregateQuerySnapshot.getCount() + " " + "bars")
+                ).addOnFailureListener(e -> {
+                    viewHolder.getTotalBars().setText("No s'ha pogut recuperar el total de bars");
+                })
+        );
 
-
-        cityAdapter = new CityAdapter(citiesViewModel.getCitiesOptions(), (city) -> {
+        cityAdapter.setOnItemClickListener((city) -> {
             if (getContext() != null && getContext().getApplicationContext() != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString("cityId", city.getId());

@@ -4,6 +4,7 @@ import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.model.City;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.AggregateQuery;
 import com.google.firebase.firestore.AggregateQuerySnapshot;
 import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.CollectionReference;
@@ -118,17 +119,9 @@ public class BarRepository {
 
     }
 
-    public long totalBars(String cityId) throws IOException {
-        AggregateQuerySnapshot aggregateQuerySnapshot = null;
-        try {
-            CollectionReference collectionReference = bd.collection("bars");
+    public AggregateQuery getTotalBarsByCity(String cityId) {
+        CollectionReference collectionReference = bd.collection("bars");
 
-            aggregateQuerySnapshot = Tasks.await(collectionReference.where(Filter.equalTo("city", cityId))
-                    .count().get(AggregateSource.SERVER));
-
-            return aggregateQuerySnapshot.getCount();
-        } catch (ExecutionException | InterruptedException e) {
-            throw new IOException("No s'ha recuperat el nombre de bars");
-        }
+        return collectionReference.where(Filter.equalTo("city", cityId)).count();
     }
 }
