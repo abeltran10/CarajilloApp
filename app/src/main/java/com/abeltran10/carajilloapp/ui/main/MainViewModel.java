@@ -3,11 +3,14 @@ package com.abeltran10.carajilloapp.ui.main;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.abeltran10.carajilloapp.data.EventWrapper;
 import com.abeltran10.carajilloapp.data.model.Bar;
+import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.repo.CitiesRepository;
 import com.abeltran10.carajilloapp.data.repo.RatingRepository;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -24,7 +27,7 @@ public class MainViewModel extends ViewModel {
 
     private FirebaseFirestore bd = FirebaseFirestore.getInstance();
 
-    private MutableLiveData<MainResult> mainResult = new MutableLiveData<>();
+    private MutableLiveData<EventWrapper<MainResult>> mainResult = new MutableLiveData<>();
 
 
     public MainViewModel(BarRepository barRepository, RatingRepository ratingRepository, CitiesRepository citiesRepository) {
@@ -33,8 +36,25 @@ public class MainViewModel extends ViewModel {
         this.citiesRepository = citiesRepository;
     }
 
-    public MutableLiveData<MainResult> getMainResult() {
+    public MutableLiveData<EventWrapper<MainResult>> getMainResult() {
         return mainResult;
+    }
+
+    public Query searchBars(City city, String searchText) {
+        Query query;
+
+        if (searchText.isEmpty())
+            query = bd.collection("bars")
+                    .whereEqualTo("city", city.getId())
+                    .orderBy("name", Query.Direction.ASCENDING);
+        else
+           query = bd.collection("bars")
+                .whereEqualTo("city", city.getId())
+                .orderBy("name", Query.Direction.ASCENDING)
+                .startAt(searchText.toUpperCase())
+                .endAt(searchText.toUpperCase() + "\uf8ff");
+
+        return query;
     }
 
     public void vote(Float newRating, Bar bar) {
@@ -51,9 +71,9 @@ public class MainViewModel extends ViewModel {
 
             return null;
         }).addOnSuccessListener(aVoid -> {
-            mainResult.postValue(new MainResult(new MainView(newRating, bar)));
+            mainResult.postValue(new EventWrapper(new MainResult(new MainView(newRating, bar))));
         }).addOnFailureListener(e -> {
-            mainResult.postValue(new MainResult(e.getMessage()));
+            mainResult.postValue(new EventWrapper(new MainResult(e.getMessage())));
         });
 
     }

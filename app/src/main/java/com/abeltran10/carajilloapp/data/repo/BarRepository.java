@@ -4,6 +4,7 @@ import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.model.City;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.AggregateQuery;
 import com.google.firebase.firestore.AggregateQuerySnapshot;
 import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.CollectionReference;
@@ -13,6 +14,7 @@ import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Source;
 import com.google.firebase.firestore.Transaction;
 
 import java.io.IOException;
@@ -49,12 +51,12 @@ public class BarRepository {
 
         name = name.toUpperCase();
 
-        Query q = bd.collection("bars").where(Filter.and(Filter.equalTo("name", name),
-                Filter.equalTo("address", address),
-                Filter.equalTo("city", city.getId()), Filter.equalTo("postalCode", postalCode)));
+        Query q = bd.collection("bars").whereEqualTo("name", name)
+                .whereEqualTo("address", address)
+                .whereEqualTo("city", city.getId());
 
         try {
-            QuerySnapshot querySnapshot = Tasks.await(q.get());
+            QuerySnapshot querySnapshot = Tasks.await(q.get(Source.SERVER));
 
             if (querySnapshot.getDocuments().isEmpty()) {
 
@@ -101,6 +103,8 @@ public class BarRepository {
 
         try {
             DocumentSnapshot documentSnapshot = Tasks.await(bd.collection("bars").document(idBar).get());
+
+            map.put("id", documentSnapshot.getString("id"));
             map.put("name", documentSnapshot.getString("name"));
             map.put("city", documentSnapshot.getString("city"));
             map.put("address", documentSnapshot.getString("address"));
@@ -117,17 +121,9 @@ public class BarRepository {
 
     }
 
-    public long totalBars(String cityId) throws IOException {
-        AggregateQuerySnapshot aggregateQuerySnapshot = null;
-        try {
-            CollectionReference collectionReference = bd.collection("bars");
+    public AggregateQuery getTotalBarsByCity(String cityId) {
+        CollectionReference collectionReference = bd.collection("bars");
 
-            aggregateQuerySnapshot = Tasks.await(collectionReference.where(Filter.equalTo("city", cityId))
-                    .count().get(AggregateSource.SERVER));
-
-            return aggregateQuerySnapshot.getCount();
-        } catch (ExecutionException | InterruptedException e) {
-            throw new IOException("No s'ha recuperat el nombre de bars");
-        }
+        return collectionReference.where(Filter.equalTo("city", cityId)).count();
     }
 }
