@@ -2,12 +2,17 @@ package com.abeltran10.carajilloapp.ui.main;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,9 +26,6 @@ import com.abeltran10.carajilloapp.ui.bar.BarFragment;
 import com.abeltran10.carajilloapp.ui.rating.RatingDialogFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.Filter;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 public class MainFragment extends Fragment {
 
@@ -32,6 +34,8 @@ public class MainFragment extends Fragment {
     private MainViewModel mainViewModel;
 
     private MainAdapter mainAdapter;
+
+    private RecyclerView recyclerView;
 
 
     public static MainFragment newInstance() {
@@ -64,30 +68,10 @@ public class MainFragment extends Fragment {
             city.setName(getArguments().getString("cityName"));
         }
 
-        mainAdapter = new MainAdapter(mainViewModel.getBarsOptions(city), city);
-
-        mainAdapter.setOnItemClickListener((bar, c) -> {
-            if (getContext() != null && getContext().getApplicationContext() != null) {
-                Bundle bundle = new Bundle();
-                bundle.putString("id", bar.getId());
-                bundle.putString("name", bar.getName());
-                bundle.putString("cityId", c.getId());
-                bundle.putString("cityName", c.getName());
-                bundle.putString("address", bar.getAddress());
-                bundle.putString("postalCode", bar.getPostalCode());
-                bundle.putFloat("rating", bar.getRating());
-                bundle.putLong("totalVotes", bar.getTotalVotes());
-
-                RatingDialogFragment ratingDialogFragment = RatingDialogFragment.newInstance();
-                ratingDialogFragment.setArguments(bundle);
-
-                ratingDialogFragment.show(requireActivity().getSupportFragmentManager(), "ratingDialog");
-            }
-        });
-
-        RecyclerView recyclerView = binding.listView;
+        recyclerView = binding.listView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(mainAdapter);
+
+        setMainAdapter(city, "");
 
         FloatingActionButton fab = binding.floatingButton;
         fab.setOnClickListener(view1 -> {
@@ -114,6 +98,38 @@ public class MainFragment extends Fragment {
             }
         });
 
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.menu, menu);
+
+                MenuItem searchItem = menu.findItem(R.id.action_search);
+                SearchView searchView = (SearchView) searchItem.getActionView();
+                searchView.setQueryHint("Cerca un bar...");
+
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String text) {
+                        setMainAdapter(city, text);
+
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        setMainAdapter(city, newText);
+
+                        return true;
+                    }
+                });
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                return false;
+            }
+        }, getViewLifecycleOwner());
+
     }
 
     private void showMainSuccess(MainView success) {
@@ -135,6 +151,40 @@ public class MainFragment extends Fragment {
                     error,
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void setMainAdapter(City city, String search) {
+        FirestoreRecyclerOptions<Bar> options = new FirestoreRecyclerOptions.Builder<Bar>()
+                .setQuery(mainViewModel.searchBars(city, search), Bar.class)
+                .build();
+
+        if (mainAdapter != null)
+            mainAdapter.stopListening();
+
+        mainAdapter = new MainAdapter(options, city);
+
+        mainAdapter.setOnItemClickListener((bar, c) -> {
+            if (getContext() != null && getContext().getApplicationContext() != null) {
+                Bundle bundle = new Bundle();
+                bundle.putString("id", bar.getId());
+                bundle.putString("name", bar.getName());
+                bundle.putString("cityId", c.getId());
+                bundle.putString("cityName", c.getName());
+                bundle.putString("address", bar.getAddress());
+                bundle.putString("postalCode", bar.getPostalCode());
+                bundle.putFloat("rating", bar.getRating());
+                bundle.putLong("totalVotes", bar.getTotalVotes());
+
+                RatingDialogFragment ratingDialogFragment = RatingDialogFragment.newInstance();
+                ratingDialogFragment.setArguments(bundle);
+
+                ratingDialogFragment.show(requireActivity().getSupportFragmentManager(), "ratingDialog");
+            }
+        });
+
+        recyclerView.setAdapter(mainAdapter);
+
+        mainAdapter.startListening();
     }
 
     @Override

@@ -32,8 +32,16 @@ public class CityAdapter extends FirestoreRecyclerAdapter<City, CityAdapter.View
         this.onBindTotalBars = onBindTotalBars;
     }
 
+    public CityAdapter(@NonNull FirestoreRecyclerOptions<City> options) {
+        super(options);
+    }
+
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    public void setOnBindTotalBars(OnBindTotalBars onBindTotalBars) {
+        this.onBindTotalBars = onBindTotalBars;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -9,7 +9,6 @@ import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.repo.CitiesRepository;
 import com.abeltran10.carajilloapp.data.repo.RatingRepository;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -41,14 +40,21 @@ public class MainViewModel extends ViewModel {
         return mainResult;
     }
 
-    public FirestoreRecyclerOptions<Bar> getBarsOptions(City city) {
-        Query query = bd.collection("bars")
-                .whereEqualTo("city", city.getId())
-                .orderBy("name", Query.Direction.ASCENDING);
+    public Query searchBars(City city, String searchText) {
+        Query query;
 
-        return new FirestoreRecyclerOptions.Builder<Bar>()
-                .setQuery(query, Bar.class)
-                .build();
+        if (searchText.isEmpty())
+            query = bd.collection("bars")
+                    .whereEqualTo("city", city.getId())
+                    .orderBy("name", Query.Direction.ASCENDING);
+        else
+           query = bd.collection("bars")
+                .whereEqualTo("city", city.getId())
+                .orderBy("name", Query.Direction.ASCENDING)
+                .startAt(searchText.toUpperCase())
+                .endAt(searchText.toUpperCase() + "\uf8ff");
+
+        return query;
     }
 
     public void vote(Float newRating, Bar bar) {

@@ -23,12 +23,22 @@ public class CitiesViewModel extends ViewModel {
         this.barRepository = barRepository;
     }
 
-    public FirestoreRecyclerOptions<City> getCitiesOptions() {
-        Query query = bd.collection("cities").orderBy("name", Query.Direction.ASCENDING);;
-        return new FirestoreRecyclerOptions.Builder<City>().setQuery(query, City.class).build();
-    }
-
     public AggregateQuery getTotalBarsByCity(String cityId) {
         return barRepository.getTotalBarsByCity(cityId);
+    }
+
+    public Query searchCities(String searchText) {
+        Query query;
+
+        if (searchText.isEmpty()) {
+            query = bd.collection("cities").orderBy("name", Query.Direction.ASCENDING);
+        } else {
+            query = bd.collection("cities")
+                    .orderBy("name", Query.Direction.ASCENDING)
+                    .startAt(searchText)
+                    .endAt(searchText + "\uf8ff");
+        }
+
+        return query;
     }
 }
