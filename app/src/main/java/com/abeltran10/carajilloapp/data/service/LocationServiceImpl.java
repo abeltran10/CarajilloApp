@@ -50,10 +50,10 @@ public class LocationServiceImpl implements LocationService {
                         street = street.substring(street.indexOf("Calle "));
                         street = "Carrer " + street;
                     } else if (street.indexOf("Plaza ") != -1) {
-                        street.substring(street.indexOf("Plaza "));
+                        street = street.substring(street.indexOf("Plaza "));
                         street = "Plaça " + street;
                     } else if (street.indexOf("Avenida ") != -1) {
-                        street.substring(street.indexOf("Avenida "));
+                        street = street.substring(street.indexOf("Avenida "));
                         street = "Avinguda " + street;
                     }
 
