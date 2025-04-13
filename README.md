@@ -2,7 +2,7 @@
 
 ## Descripció
 
-CarajilloApp és una app per Android on els usuaris poden: crear un compte, iniciar sesió, insertar un bar i puntuar el seu carajillo. S'utilitza una bases de dades al nuvol amb Firebase.
+CarajilloApp és una app per Android on els usuaris poden: crear un compte, iniciar sessió, insertar un bar, cercar els bars propers i puntuar el seu carajillo. S'utilitza una bases de dades al nuvol amb Firebase.
 
 ## Llançaments
 - [RC-3.0.0](https://github.com/abeltran10/CarajilloApp/releases/tag/RC-3.0.0) Aquesta es candidata a release
