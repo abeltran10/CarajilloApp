@@ -1,5 +1,7 @@
 package com.abeltran10.carajilloapp.ui.main;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -7,18 +9,25 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abeltran10.carajilloapp.R;
+import com.abeltran10.carajilloapp.data.EventWrapper;
 import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.databinding.FragmentMainBinding;
@@ -26,6 +35,8 @@ import com.abeltran10.carajilloapp.ui.bar.BarFragment;
 import com.abeltran10.carajilloapp.ui.rating.RatingDialogFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.List;
 
 public class MainFragment extends Fragment {
 
@@ -37,6 +48,12 @@ public class MainFragment extends Fragment {
 
     private RecyclerView recyclerView;
 
+    private ProgressBar loadingBar;
+
+    private City city;
+
+    private ActivityResultLauncher<String> requestPermissionLauncher;
+
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -45,6 +62,8 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestLocationPermission();
     }
 
 
@@ -62,7 +81,7 @@ public class MainFragment extends Fragment {
         mainViewModel = new ViewModelProvider(requireActivity(), new MainViewModelFactory())
                 .get(MainViewModel.class);
 
-        City city = new City();
+        city = new City();
         if (getArguments() != null) {
             city.setId(getArguments().getString("cityId"));
             city.setName(getArguments().getString("cityName"));
@@ -71,7 +90,9 @@ public class MainFragment extends Fragment {
         recyclerView = binding.listView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        setMainAdapter(city, "");
+        loadingBar = binding.loadingBar;
+
+        setMainAdapter(city, "", null);
 
         FloatingActionButton fab = binding.floatingButton;
         fab.setOnClickListener(view1 -> {
@@ -101,7 +122,7 @@ public class MainFragment extends Fragment {
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.menu, menu);
+                menuInflater.inflate(R.menu.menu_bar, menu);
 
                 MenuItem searchItem = menu.findItem(R.id.action_search);
                 SearchView searchView = (SearchView) searchItem.getActionView();
@@ -110,17 +131,32 @@ public class MainFragment extends Fragment {
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String text) {
-                        setMainAdapter(city, text);
+                        setMainAdapter(city, text, null);
 
                         return true;
                     }
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        setMainAdapter(city, newText);
+                        setMainAdapter(city, newText, null);
 
                         return true;
                     }
+                });
+
+                MenuItem locationItem = menu.findItem(R.id.action_location);
+                locationItem.setOnMenuItemClickListener(view -> {
+
+                    if (ContextCompat.checkSelfPermission(
+                            requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        loadingBar.setVisibility(View.VISIBLE);
+                        mainViewModel.loadCurrentLocation(getContext(), city);
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+                    }
+
+                    return true;
                 });
             }
 
@@ -130,7 +166,31 @@ public class MainFragment extends Fragment {
             }
         }, getViewLifecycleOwner());
 
+        mainViewModel.getMainLocationResult().observe(getViewLifecycleOwner(), mainLocationResult -> {
+            loadingBar.setVisibility(View.GONE);
+            if (mainLocationResult != null && mainLocationResult.getSuccess() != null) {
+                setMainAdapter(city, "", mainLocationResult.getSuccess());
+            }
+
+            if (mainLocationResult != null && mainLocationResult.getError() != null) {
+                showMainError(mainLocationResult.getError());
+            }
+        });
+
     }
+
+    private void requestLocationPermission() {
+        requestPermissionLauncher =
+                registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                    if (isGranted) {
+                        loadingBar.setVisibility(View.VISIBLE);
+                        mainViewModel.loadCurrentLocation(getContext(), city);
+                    } else {
+                        Toast.makeText(getContext(), "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
 
     private void showMainSuccess(MainView success) {
         if (getContext() != null && getContext().getApplicationContext() != null) {
@@ -153,9 +213,9 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setMainAdapter(City city, String search) {
+    private void setMainAdapter(City city, String search, List<Bar> barList) {
         FirestoreRecyclerOptions<Bar> options = new FirestoreRecyclerOptions.Builder<Bar>()
-                .setQuery(mainViewModel.searchBars(city, search), Bar.class)
+                .setQuery(mainViewModel.searchBars(city, search, barList), Bar.class)
                 .build();
 
         if (mainAdapter != null)
@@ -171,6 +231,8 @@ public class MainFragment extends Fragment {
                 bundle.putString("cityId", c.getId());
                 bundle.putString("cityName", c.getName());
                 bundle.putString("address", bar.getAddress());
+                bundle.putDouble("latitude", bar.getLatitude());
+                bundle.putDouble("longitude", bar.getLongitude());
                 bundle.putString("postalCode", bar.getPostalCode());
                 bundle.putFloat("rating", bar.getRating());
                 bundle.putLong("totalVotes", bar.getTotalVotes());

@@ -10,6 +10,10 @@ public class Bar {
 
     private String address;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private String postalCode;
 
     private Float rating;
@@ -23,11 +27,13 @@ public class Bar {
         this.id = id;
     }
 
-    public Bar(String id, String name, String city, String address, String postalCode, Float rating, Long totalVotes) {
+    public Bar(String id, String name, String city, Street address, String postalCode, Float rating, Long totalVotes) {
         this.id = id;
         this.name = name;
         this.city = city;
-        this.address = address;
+        this.address = address.getName();
+        this.latitude = address.getLatitude();
+        this.longitude = address.getLongitude();
         this.postalCode = postalCode;
         this.rating = rating;
         this.totalVotes = totalVotes;
@@ -63,6 +69,22 @@ public class Bar {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public String getPostalCode() {

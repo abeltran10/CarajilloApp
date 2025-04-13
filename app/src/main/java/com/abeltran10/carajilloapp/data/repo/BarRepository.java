@@ -1,8 +1,16 @@
 package com.abeltran10.carajilloapp.data.repo;
 
+import android.location.Location;
+
+import androidx.annotation.NonNull;
+
+import com.abeltran10.carajilloapp.data.Callback;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.model.City;
+import com.abeltran10.carajilloapp.data.model.Street;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.AggregateQuery;
 import com.google.firebase.firestore.AggregateQuerySnapshot;
@@ -18,7 +26,9 @@ import com.google.firebase.firestore.Source;
 import com.google.firebase.firestore.Transaction;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -45,14 +55,14 @@ public class BarRepository {
         return instance;
     }
 
-    public Result createBar(String name, String address, City city, String postalCode) {
+    public Result createBar(String name, Street address, City city, String postalCode) {
         Result result = null;
         Bar bar = null;
 
         name = name.toUpperCase();
 
         Query q = bd.collection("bars").whereEqualTo("name", name)
-                .whereEqualTo("address", address)
+                .whereEqualTo("address", address.getName())
                 .whereEqualTo("city", city.getId());
 
         try {
@@ -67,9 +77,11 @@ public class BarRepository {
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", idBar);
                 map.put("name", name);
-                map.put("address", address);
+                map.put("address", address.getName());
                 map.put("city", city.getId());
                 map.put("postalCode", postalCode);
+                map.put("latitude", address.getLatitude());
+                map.put("longitude", address.getLongitude());
                 map.put("rating", 0.0);
                 map.put("totalVotes", 0);
 
@@ -77,7 +89,9 @@ public class BarRepository {
 
                 bar = new Bar(idBar);
                 bar.setName(name);
-                bar.setAddress(address);
+                bar.setAddress(address.getName());
+                bar.setLatitude(address.getLatitude());
+                bar.setLongitude(address.getLongitude());
                 bar.setCity(city.getId());
                 bar.setPostalCode(postalCode);
                 bar.setRating(((Number)map.get("rating")).floatValue());
@@ -108,6 +122,8 @@ public class BarRepository {
             map.put("name", documentSnapshot.getString("name"));
             map.put("city", documentSnapshot.getString("city"));
             map.put("address", documentSnapshot.getString("address"));
+            map.put("latitude", documentSnapshot.getDouble("latitude"));
+            map.put("longitude", documentSnapshot.getDouble("longitude"));
             map.put("postalCode", documentSnapshot.getString("postalCode"));
             map.put("rating", averageResult);
             map.put("totalVotes", documentSnapshot.getLong("totalVotes") + 1L);
@@ -125,5 +141,42 @@ public class BarRepository {
         CollectionReference collectionReference = bd.collection("bars");
 
         return collectionReference.where(Filter.equalTo("city", cityId)).count();
+    }
+
+    public void getNearBars(Location location, String cityId, Callback callback) {
+        List<Bar> listBars = new ArrayList<>();
+        bd.collection("bars").whereEqualTo("city", cityId)
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                            Bar bar = doc.toObject(Bar.class);
+
+                            Location barLocation = new Location("Bar");
+                            barLocation.setLatitude(bar.getLatitude());
+                            barLocation.setLongitude(bar.getLongitude());
+
+                            float distance = location.distanceTo(barLocation);
+
+                            if (distance <= 500.0f) {
+                                listBars.add(bar);
+                            }
+                        }
+
+                        if (listBars.isEmpty()) {
+                            callback.onComplete(new Result.Error(new IOException("No s'han trobar bars a prop")));
+                        } else {
+                            callback.onComplete(new Result.Success<List<Bar>>(listBars));
+                        }
+
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onComplete(new Result.Error(new IOException("Ha hagut un problema al cercar els bars")));
+                    }
+                });
+
     }
 }

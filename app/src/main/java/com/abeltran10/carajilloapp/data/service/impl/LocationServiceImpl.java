@@ -1,7 +1,9 @@
-package com.abeltran10.carajilloapp.data.service;
+package com.abeltran10.carajilloapp.data.service.impl;
 
 import com.abeltran10.carajilloapp.BuildConfig;
 import com.abeltran10.carajilloapp.data.Result;
+import com.abeltran10.carajilloapp.data.model.Street;
+import com.abeltran10.carajilloapp.data.service.LocationService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,7 +21,7 @@ public class LocationServiceImpl implements LocationService {
 
 
     @Override
-    public Result addressExists(String address, String postalCode, String city) {
+    public Result getStreet(String address, String postalCode, String city) {
         OkHttpClient client = new OkHttpClient();
 
         String formatedAddress = address.replace(" ", "%20") + "%2C+" +
@@ -34,7 +36,7 @@ public class LocationServiceImpl implements LocationService {
                     .build();
 
             Response response = client.newCall(request).execute();
-            String street = null;
+            Street street = null;
             if (response.isSuccessful()) {
                 String responseBody = (response.body() != null) ? response.body().string() : null;
 
@@ -43,25 +45,33 @@ public class LocationServiceImpl implements LocationService {
 
                 // si recupera adreça i còdi postal com a mínim
                 if (totalResults >= 2) {
+                    street = new Street();
                     JSONObject result1 = (JSONObject) json.getJSONArray("results").get(0);
-                    street = result1.getJSONObject("components").getString("road");
+                    String road = result1.getJSONObject("components").getString("road");
+                    Double lat = result1.getJSONObject("geometry").getDouble("lat");
+                    Double lng = result1.getJSONObject("geometry").getDouble("lng");
 
-                    if (street.indexOf("Calle ") != -1) {
-                        street = street.substring(street.indexOf("Calle "));
-                        street = "Carrer " + street;
-                    } else if (street.indexOf("Plaza ") != -1) {
-                        street.substring(street.indexOf("Plaza "));
-                        street = "Plaça " + street;
-                    } else if (street.indexOf("Avenida ") != -1) {
-                        street.substring(street.indexOf("Avenida "));
-                        street = "Avinguda " + street;
+                    if (road.indexOf("Calle ") != -1) {
+                        road = road.substring(road.indexOf("Calle "));
+                        road = "Carrer " + road;
+                    } else if (road.indexOf("Plaza ") != -1) {
+                        road = road.substring(road.indexOf("Plaza "));
+                        road = "Plaça " + road;
+                    } else if (road.indexOf("Avenida ") != -1) {
+                        road = road.substring(road.indexOf("Avenida "));
+                        road = "Avinguda " + road;
                     }
 
+                    street.setName(road);
+                    street.setLatitude(lat);
+                    street.setLongitude(lng);
+
+                    return new Result.Success<Street>(street);
                 }
 
             }
 
-            return new Result.Success<String>(street);
+            return new Result.Error(new Exception("L'adreça no és valida"));
         } catch (IOException | IllegalStateException | JSONException ex) {
             return new Result.Error(new Exception("Ha hagut un problema i no s'ha pogut validar l'adreça"));
         }
