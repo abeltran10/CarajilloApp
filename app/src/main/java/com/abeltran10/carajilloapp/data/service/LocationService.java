@@ -4,6 +4,6 @@ import com.abeltran10.carajilloapp.data.Result;
 
 public interface LocationService {
 
-     Result addressExists(String address, String postalCode, String city);
+     Result getStreet(String address, String postalCode, String city);
 
 }

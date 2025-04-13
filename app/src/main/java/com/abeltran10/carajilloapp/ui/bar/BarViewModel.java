@@ -8,9 +8,10 @@ import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.Result;
 import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.model.City;
+import com.abeltran10.carajilloapp.data.model.Street;
 import com.abeltran10.carajilloapp.data.repo.BarRepository;
 import com.abeltran10.carajilloapp.data.service.LocationService;
-import com.abeltran10.carajilloapp.data.service.LocationServiceImpl;
+import com.abeltran10.carajilloapp.data.service.impl.LocationServiceImpl;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,9 +39,9 @@ public class BarViewModel extends ViewModel {
     public void create(String name, String address, City city, String postalCode) {
         executorService.execute(() -> {
 
-            Result locationResult = locationService.addressExists(address, postalCode, city.getName());
+            Result locationResult = locationService.getStreet(address, postalCode, city.getName());
             if (locationResult instanceof Result.Success) {
-                String street = ((Result.Success<String>)locationResult).getData();
+                Street street = ((Result.Success<Street>)locationResult).getData();
 
                 if (street != null) {
                     Result repositoryResult = barRepository.createBar(name, street, city, postalCode);
