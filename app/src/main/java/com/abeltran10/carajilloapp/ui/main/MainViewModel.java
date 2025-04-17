@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 
+import androidx.activity.result.IntentSenderRequest;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.MenuProvider;
 import androidx.lifecycle.MutableLiveData;
@@ -42,7 +43,9 @@ public class MainViewModel extends ViewModel {
 
     private MutableLiveData<EventWrapper<MainResult>> mainResult = new MutableLiveData<>();
 
-    private MutableLiveData<MainLocationResult> mainLocationResult = new MutableLiveData<>();
+    private MutableLiveData<EventWrapper<MainLocationResult>> mainLocationResult = new MutableLiveData<>();
+
+    private MutableLiveData<EventWrapper<MainIntentResult>> mainGPSResult = new MutableLiveData<>();
 
     private FusedLocationService fusedLocationService = new FusedLocationServiceImpl();
 
@@ -56,8 +59,12 @@ public class MainViewModel extends ViewModel {
         return mainResult;
     }
 
-    public MutableLiveData<MainLocationResult> getMainLocationResult() {
+    public MutableLiveData<EventWrapper<MainLocationResult>> getMainLocationResult() {
         return mainLocationResult;
+    }
+
+    public MutableLiveData<EventWrapper<MainIntentResult>> getMainGPSResult() {
+        return mainGPSResult;
     }
 
     public Query searchBars(City city, String searchText, List<Bar> barList) {
@@ -103,9 +110,9 @@ public class MainViewModel extends ViewModel {
 
             return null;
         }).addOnSuccessListener(aVoid -> {
-            mainResult.postValue(new EventWrapper(new MainResult(new MainView(newRating, bar))));
+            mainResult.postValue(new EventWrapper<>(new MainResult(new MainView(newRating, bar))));
         }).addOnFailureListener(e -> {
-            mainResult.postValue(new EventWrapper(new MainResult(e.getMessage())));
+            mainResult.postValue(new EventWrapper<>(new MainResult(e.getMessage())));
         });
 
     }
@@ -120,16 +127,29 @@ public class MainViewModel extends ViewModel {
                 barRepository.getNearBars(((Result.Success<Location>) locationResult).getData(), city.getId(), searchResult -> {
                     if (searchResult instanceof Result.Success) {
                         List<Bar> listBars = (List<Bar>) ((Result.Success<?>) searchResult).getData();
-                        mainLocationResult.postValue(new MainLocationResult(listBars));
+                        MainLocationResult mainLocation = new MainLocationResult(listBars);
+                        mainLocationResult.postValue(new EventWrapper<>(mainLocation));
                     } else {
                         String error = ((Result.Error) searchResult).getError().getMessage();
-                        mainLocationResult.postValue(new MainLocationResult(error));
+                        MainLocationResult mainLocation = new MainLocationResult(error);
+                        mainLocationResult.postValue(new EventWrapper<>(mainLocation));
                     }
 
                 });
             } else {
                 String error = ((Result.Error) locationResult).getError().getMessage();
-                mainLocationResult.postValue(new MainLocationResult(error));
+                MainLocationResult mainLocation = new MainLocationResult(error);
+                mainLocationResult.postValue(new EventWrapper<>(mainLocation));
+            }
+        }, resolution -> {
+            if (resolution instanceof Result.Success) {
+                IntentSenderRequest intentSenderRequest = (IntentSenderRequest) ((Result.Success<?>) resolution).getData();
+                MainIntentResult mainIntentResult = new MainIntentResult(intentSenderRequest);
+                mainGPSResult.postValue(new EventWrapper<>(mainIntentResult));
+            } else {
+                String error = ((Result.Error) resolution).getError().getMessage();
+                MainIntentResult mainIntentResult = new MainIntentResult(error);
+                mainGPSResult.postValue(new EventWrapper<>(mainIntentResult));
             }
         });
     }

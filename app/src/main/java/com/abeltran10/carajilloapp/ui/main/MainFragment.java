@@ -1,6 +1,7 @@
 package com.abeltran10.carajilloapp.ui.main;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,6 +56,8 @@ public class MainFragment extends Fragment {
 
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
+    private ActivityResultLauncher<IntentSenderRequest> gpsLauncher;
+
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -64,6 +68,7 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         requestLocationPermission();
+        gpsLauncher();
     }
 
 
@@ -166,14 +171,28 @@ public class MainFragment extends Fragment {
             }
         }, getViewLifecycleOwner());
 
-        mainViewModel.getMainLocationResult().observe(getViewLifecycleOwner(), mainLocationResult -> {
+        mainViewModel.getMainLocationResult().observe(getViewLifecycleOwner(), eventWrapper -> {
             loadingBar.setVisibility(View.GONE);
+            MainLocationResult mainLocationResult = eventWrapper.getContentIfNotHandled();
             if (mainLocationResult != null && mainLocationResult.getSuccess() != null) {
                 setMainAdapter(city, "", mainLocationResult.getSuccess());
             }
 
             if (mainLocationResult != null && mainLocationResult.getError() != null) {
                 showMainError(mainLocationResult.getError());
+            }
+        });
+
+        mainViewModel.getMainGPSResult().observe(getViewLifecycleOwner(), eventWrapper -> {
+            MainIntentResult mainIntentResult = eventWrapper.getContentIfNotHandled();
+
+            if (mainIntentResult != null && mainIntentResult.getSuccess() != null) {
+                IntentSenderRequest intentSenderRequest = mainIntentResult.getSuccess();
+                gpsLauncher.launch(intentSenderRequest);
+            }
+
+            if (mainIntentResult != null && mainIntentResult.getError() != null) {
+                showMainError(mainIntentResult.getError());
             }
         });
 
@@ -186,9 +205,23 @@ public class MainFragment extends Fragment {
                         loadingBar.setVisibility(View.VISIBLE);
                         mainViewModel.loadCurrentLocation(getContext(), city);
                     } else {
-                        Toast.makeText(getContext(), "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Permis d'ubicació denegat", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void gpsLauncher() {
+        gpsLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartIntentSenderForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        loadingBar.setVisibility(View.VISIBLE);
+                        mainViewModel.loadCurrentLocation(getContext(), city);
+                    } else {
+                        Toast.makeText(getContext(), "GPS no activat", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
     }
 
 

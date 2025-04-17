@@ -6,5 +6,5 @@ import com.abeltran10.carajilloapp.data.Callback;
 
 public interface FusedLocationService {
 
-    public void getCurrentLocation(Context context, Callback callback);
+    public void getCurrentLocation(Context context, Callback callback, Callback resolution);
 }
