@@ -58,6 +58,10 @@ public class MainFragment extends Fragment {
 
     private ActivityResultLauncher<IntentSenderRequest> gpsLauncher;
 
+    private String lastSearchQuery = "";
+
+    private List<Bar> lastBars = null;
+
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -137,6 +141,8 @@ public class MainFragment extends Fragment {
                     @Override
                     public boolean onQueryTextSubmit(String text) {
                         setMainAdapter(city, text, null);
+                        lastSearchQuery = text;
+                        lastBars = null;
 
                         return true;
                     }
@@ -144,6 +150,8 @@ public class MainFragment extends Fragment {
                     @Override
                     public boolean onQueryTextChange(String newText) {
                         setMainAdapter(city, newText, null);
+                        lastSearchQuery = newText;
+                        lastBars = null;
 
                         return true;
                     }
@@ -156,7 +164,7 @@ public class MainFragment extends Fragment {
                             requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
                         loadingBar.setVisibility(View.VISIBLE);
-                        mainViewModel.loadCurrentLocation(getContext(), city);
+                        mainViewModel.loadCurrentLocation(requireActivity().getApplicationContext(), city);
                     } else {
                         requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
                     }
@@ -176,6 +184,8 @@ public class MainFragment extends Fragment {
             MainLocationResult mainLocationResult = eventWrapper.getContentIfNotHandled();
             if (mainLocationResult != null && mainLocationResult.getSuccess() != null) {
                 setMainAdapter(city, "", mainLocationResult.getSuccess());
+                lastSearchQuery = "";
+                lastBars = mainLocationResult.getSuccess();
             }
 
             if (mainLocationResult != null && mainLocationResult.getError() != null) {
@@ -203,7 +213,7 @@ public class MainFragment extends Fragment {
                 registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) {
                         loadingBar.setVisibility(View.VISIBLE);
-                        mainViewModel.loadCurrentLocation(getContext(), city);
+                        mainViewModel.loadCurrentLocation(requireActivity().getApplicationContext(), city);
                     } else {
                         Toast.makeText(getContext(), "Permis d'ubicació denegat", Toast.LENGTH_SHORT).show();
                     }
@@ -216,7 +226,7 @@ public class MainFragment extends Fragment {
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         loadingBar.setVisibility(View.VISIBLE);
-                        mainViewModel.loadCurrentLocation(getContext(), city);
+                        mainViewModel.loadCurrentLocation(requireActivity().getApplicationContext(), city);
                     } else {
                         Toast.makeText(getContext(), "GPS no activat", Toast.LENGTH_SHORT).show();
                     }
@@ -285,12 +295,28 @@ public class MainFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        mainAdapter.startListening();
+        if (mainAdapter != null) {
+            setMainAdapter(city, lastSearchQuery, lastBars);
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mainAdapter.stopListening();
+        if (mainAdapter != null) {
+            mainAdapter.stopListening();
+        }
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (mainAdapter != null) {
+            mainAdapter.stopListening();
+            recyclerView.setAdapter(null);
+            mainAdapter = null;
+        }
+
+        super.onDestroyView();
     }
 }
