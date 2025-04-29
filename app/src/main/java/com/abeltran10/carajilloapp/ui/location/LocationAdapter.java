@@ -70,7 +70,7 @@ public class LocationAdapter extends FirestoreRecyclerAdapter<Bar, LocationAdapt
             // URI para Maps
             Uri gmmIntentUri = Uri.parse("geo:0,0" + "?q=Bar "
                     + bar.getName() + ", " + bar.getAddress() + " "
-                    + bar.getPostalCode() + ", " + bar.getCity());
+                    + bar.getPostalCode() + ", " + city.getName());
 
             // Intent explícito
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
