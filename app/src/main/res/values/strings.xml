@@ -29,4 +29,7 @@
 
     <!-- Rating strings -->
     <string name="action_vote">Puntuar</string>
+
+
+    <string name="location_button">Obrir la localització a Google Maps</string>
 </resources>

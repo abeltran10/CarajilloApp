@@ -34,11 +34,14 @@ import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.databinding.FragmentMainBinding;
 import com.abeltran10.carajilloapp.ui.bar.BarFragment;
+import com.abeltran10.carajilloapp.ui.location.LocationFragment;
 import com.abeltran10.carajilloapp.ui.rating.RatingDialogFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainFragment extends Fragment {
 
@@ -59,8 +62,6 @@ public class MainFragment extends Fragment {
     private ActivityResultLauncher<IntentSenderRequest> gpsLauncher;
 
     private String lastSearchQuery = "";
-
-    private List<Bar> lastBars = null;
 
 
     public static MainFragment newInstance() {
@@ -101,7 +102,7 @@ public class MainFragment extends Fragment {
 
         loadingBar = binding.loadingBar;
 
-        setMainAdapter(city, "", null);
+        setMainAdapter(city, "");
 
         FloatingActionButton fab = binding.floatingButton;
         fab.setOnClickListener(view1 -> {
@@ -140,18 +141,16 @@ public class MainFragment extends Fragment {
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String text) {
-                        setMainAdapter(city, text, null);
+                        setMainAdapter(city, text);
                         lastSearchQuery = text;
-                        lastBars = null;
 
                         return true;
                     }
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        setMainAdapter(city, newText, null);
+                        setMainAdapter(city, newText);
                         lastSearchQuery = newText;
-                        lastBars = null;
 
                         return true;
                     }
@@ -183,9 +182,21 @@ public class MainFragment extends Fragment {
             loadingBar.setVisibility(View.GONE);
             MainLocationResult mainLocationResult = eventWrapper.getContentIfNotHandled();
             if (mainLocationResult != null && mainLocationResult.getSuccess() != null) {
-                setMainAdapter(city, "", mainLocationResult.getSuccess());
-                lastSearchQuery = "";
-                lastBars = mainLocationResult.getSuccess();
+                List<Bar> barList = mainLocationResult.getSuccess();
+                List<String> barIdList = barList.stream()
+                        .map(Bar::getId)
+                        .collect(Collectors.toList());
+
+                Bundle bundle = new Bundle();
+                bundle.putString("cityId", city.getId());
+                bundle.putString("cityName", city.getName());
+                bundle.putStringArrayList("barsIdList", (ArrayList<String>) barIdList);
+
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .replace(R.id.frame_container, LocationFragment.class, bundle)
+                        .addToBackStack("main")
+                        .commit();
             }
 
             if (mainLocationResult != null && mainLocationResult.getError() != null) {
@@ -256,9 +267,9 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setMainAdapter(City city, String search, List<Bar> barList) {
+    private void setMainAdapter(City city, String search) {
         FirestoreRecyclerOptions<Bar> options = new FirestoreRecyclerOptions.Builder<Bar>()
-                .setQuery(mainViewModel.searchBars(city, search, barList), Bar.class)
+                .setQuery(mainViewModel.searchBars(city, search), Bar.class)
                 .build();
 
         if (mainAdapter != null)
@@ -296,7 +307,7 @@ public class MainFragment extends Fragment {
     public void onStart() {
         super.onStart();
         if (mainAdapter != null) {
-            setMainAdapter(city, lastSearchQuery, lastBars);
+            setMainAdapter(city, lastSearchQuery);
         }
     }
 
