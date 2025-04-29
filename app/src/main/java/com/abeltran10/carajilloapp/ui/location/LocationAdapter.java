@@ -87,7 +87,9 @@ public class LocationAdapter extends FirestoreRecyclerAdapter<Bar, LocationAdapt
         viewHolder.getRating().setRating(bar.getRating());
         viewHolder.getMap().setOnClickListener(view -> {
             // URI para Maps
-            Uri gmmIntentUri = Uri.parse("geo:" + bar.getLatitude() + "," + bar.getLongitude() + "?q=" + bar.getAddress() + ", " + bar.getName());
+            Uri gmmIntentUri = Uri.parse("geo:0,0" + "?q=Bar "
+                    + bar.getName() + ", " + bar.getAddress() + " "
+                    + bar.getPostalCode() + ", " + bar.getCity());
 
             // Intent explícito
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
