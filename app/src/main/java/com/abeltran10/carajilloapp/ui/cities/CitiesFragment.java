@@ -1,6 +1,7 @@
 package com.abeltran10.carajilloapp.ui.cities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +24,7 @@ import com.abeltran10.carajilloapp.databinding.FragmentCitiesBinding;
 import com.abeltran10.carajilloapp.ui.main.MainFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.AggregateSource;
+import com.google.firebase.firestore.Query;
 
 public class CitiesFragment extends Fragment {
 
@@ -33,6 +35,8 @@ public class CitiesFragment extends Fragment {
     private CityAdapter cityAdapter;
 
     private RecyclerView recyclerView;
+
+    private String lastSearchQuery = "";
 
     public static CitiesFragment newInstance() {
         return new CitiesFragment();
@@ -72,13 +76,14 @@ public class CitiesFragment extends Fragment {
                     @Override
                     public boolean onQueryTextSubmit(String text) {
                         setCityAdapter(text);
-
+                        lastSearchQuery = text;
                         return true;
                     }
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
                         setCityAdapter(newText);
+                        lastSearchQuery = newText;
 
                         return true;
                     }
@@ -93,29 +98,36 @@ public class CitiesFragment extends Fragment {
     }
 
     private void setCityAdapter(String search) {
+        Query query = citiesViewModel.searchCities(search);
+
+        if (cityAdapter != null) {
+            cityAdapter.stopListening();
+        }
+
         FirestoreRecyclerOptions<City> options = new FirestoreRecyclerOptions.Builder<City>()
-                .setQuery(citiesViewModel.searchCities(search), City.class)
+                .setQuery(query, City.class)
                 .build();
 
-        if (cityAdapter != null)
-            cityAdapter.stopListening();
+        cityAdapter = new CityAdapter(options, (viewHolder, city) -> {
+            if (!isAdded() || binding == null) return;
 
-        cityAdapter = new CityAdapter(options, (viewHolder, city) ->
-                citiesViewModel.getTotalBarsByCity(city.getId())
-                        .get(AggregateSource.SERVER)
-                        .addOnSuccessListener(aggregateQuerySnapshot ->
-                                viewHolder.getTotalBars().setText(aggregateQuerySnapshot.getCount() + " " + "bars")
-                        ).addOnFailureListener(e -> {
-                            viewHolder.getTotalBars().setText("No s'ha pogut recuperar el total de bars");
-                        }));
+            citiesViewModel.getTotalBarsByCity(city.getId())
+                    .get(AggregateSource.SERVER)
+                    .addOnSuccessListener(aggregateQuerySnapshot ->
+                            viewHolder.getTotalBars().setText(aggregateQuerySnapshot.getCount() + " bars")
+                    ).addOnFailureListener(e -> {
+                        viewHolder.getTotalBars().setText("No s'ha pogut recuperar el total de bars");
+                    });
+        });
 
         cityAdapter.setOnItemClickListener((city) -> {
-            if (getContext() != null && getContext().getApplicationContext() != null) {
+            if (getContext() != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString("cityId", city.getId());
                 bundle.putString("cityName", city.getName());
 
-                requireActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
                         .replace(R.id.frame_container, MainFragment.class, bundle)
                         .addToBackStack("cities")
                         .commit();
@@ -123,7 +135,6 @@ public class CitiesFragment extends Fragment {
         });
 
         recyclerView.setAdapter(cityAdapter);
-
         cityAdapter.startListening();
     }
 
@@ -133,12 +144,27 @@ public class CitiesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        cityAdapter.startListening();
+        if (cityAdapter != null) {
+            setCityAdapter(lastSearchQuery);
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        cityAdapter.stopListening();
+        if (cityAdapter != null) {
+            cityAdapter.stopListening();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (cityAdapter != null) {
+            cityAdapter.stopListening();
+            recyclerView.setAdapter(null);
+            cityAdapter = null;
+        }
+
+        super.onDestroyView();
     }
 }

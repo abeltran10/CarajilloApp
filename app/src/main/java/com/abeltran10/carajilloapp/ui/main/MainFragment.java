@@ -34,11 +34,14 @@ import com.abeltran10.carajilloapp.data.model.Bar;
 import com.abeltran10.carajilloapp.data.model.City;
 import com.abeltran10.carajilloapp.databinding.FragmentMainBinding;
 import com.abeltran10.carajilloapp.ui.bar.BarFragment;
+import com.abeltran10.carajilloapp.ui.location.LocationFragment;
 import com.abeltran10.carajilloapp.ui.rating.RatingDialogFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainFragment extends Fragment {
 
@@ -57,6 +60,8 @@ public class MainFragment extends Fragment {
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
     private ActivityResultLauncher<IntentSenderRequest> gpsLauncher;
+
+    private String lastSearchQuery = "";
 
 
     public static MainFragment newInstance() {
@@ -97,7 +102,7 @@ public class MainFragment extends Fragment {
 
         loadingBar = binding.loadingBar;
 
-        setMainAdapter(city, "", null);
+        setMainAdapter(city, "");
 
         FloatingActionButton fab = binding.floatingButton;
         fab.setOnClickListener(view1 -> {
@@ -136,14 +141,16 @@ public class MainFragment extends Fragment {
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String text) {
-                        setMainAdapter(city, text, null);
+                        setMainAdapter(city, text);
+                        lastSearchQuery = text;
 
                         return true;
                     }
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        setMainAdapter(city, newText, null);
+                        setMainAdapter(city, newText);
+                        lastSearchQuery = newText;
 
                         return true;
                     }
@@ -156,7 +163,7 @@ public class MainFragment extends Fragment {
                             requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
                         loadingBar.setVisibility(View.VISIBLE);
-                        mainViewModel.loadCurrentLocation(getContext(), city);
+                        mainViewModel.loadCurrentLocation(requireActivity().getApplicationContext(), city);
                     } else {
                         requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
                     }
@@ -175,7 +182,21 @@ public class MainFragment extends Fragment {
             loadingBar.setVisibility(View.GONE);
             MainLocationResult mainLocationResult = eventWrapper.getContentIfNotHandled();
             if (mainLocationResult != null && mainLocationResult.getSuccess() != null) {
-                setMainAdapter(city, "", mainLocationResult.getSuccess());
+                List<Bar> barList = mainLocationResult.getSuccess();
+                List<String> barIdList = barList.stream()
+                        .map(Bar::getId)
+                        .collect(Collectors.toList());
+
+                Bundle bundle = new Bundle();
+                bundle.putString("cityId", city.getId());
+                bundle.putString("cityName", city.getName());
+                bundle.putStringArrayList("barsIdList", (ArrayList<String>) barIdList);
+
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .replace(R.id.frame_container, LocationFragment.class, bundle)
+                        .addToBackStack("main")
+                        .commit();
             }
 
             if (mainLocationResult != null && mainLocationResult.getError() != null) {
@@ -203,7 +224,7 @@ public class MainFragment extends Fragment {
                 registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) {
                         loadingBar.setVisibility(View.VISIBLE);
-                        mainViewModel.loadCurrentLocation(getContext(), city);
+                        mainViewModel.loadCurrentLocation(requireActivity().getApplicationContext(), city);
                     } else {
                         Toast.makeText(getContext(), "Permis d'ubicació denegat", Toast.LENGTH_SHORT).show();
                     }
@@ -216,7 +237,7 @@ public class MainFragment extends Fragment {
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         loadingBar.setVisibility(View.VISIBLE);
-                        mainViewModel.loadCurrentLocation(getContext(), city);
+                        mainViewModel.loadCurrentLocation(requireActivity().getApplicationContext(), city);
                     } else {
                         Toast.makeText(getContext(), "GPS no activat", Toast.LENGTH_SHORT).show();
                     }
@@ -246,9 +267,9 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setMainAdapter(City city, String search, List<Bar> barList) {
+    private void setMainAdapter(City city, String search) {
         FirestoreRecyclerOptions<Bar> options = new FirestoreRecyclerOptions.Builder<Bar>()
-                .setQuery(mainViewModel.searchBars(city, search, barList), Bar.class)
+                .setQuery(mainViewModel.searchBars(city, search), Bar.class)
                 .build();
 
         if (mainAdapter != null)
@@ -285,12 +306,28 @@ public class MainFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        mainAdapter.startListening();
+        if (mainAdapter != null) {
+            setMainAdapter(city, lastSearchQuery);
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mainAdapter.stopListening();
+        if (mainAdapter != null) {
+            mainAdapter.stopListening();
+        }
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (mainAdapter != null) {
+            mainAdapter.stopListening();
+            recyclerView.setAdapter(null);
+            mainAdapter = null;
+        }
+
+        super.onDestroyView();
     }
 }

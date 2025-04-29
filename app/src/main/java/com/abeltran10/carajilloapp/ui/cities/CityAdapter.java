@@ -13,6 +13,7 @@ import com.abeltran10.carajilloapp.R;
 import com.abeltran10.carajilloapp.data.model.City;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.Query;
 
 public class CityAdapter extends FirestoreRecyclerAdapter<City, CityAdapter.ViewHolder> {
     private CityAdapter.OnItemClickListener onItemClickListener;
@@ -30,10 +31,12 @@ public class CityAdapter extends FirestoreRecyclerAdapter<City, CityAdapter.View
     public CityAdapter(@NonNull FirestoreRecyclerOptions<City> options, CityAdapter.OnBindTotalBars onBindTotalBars) {
         super(options);
         this.onBindTotalBars = onBindTotalBars;
+        setHasStableIds(true);
     }
 
     public CityAdapter(@NonNull FirestoreRecyclerOptions<City> options) {
         super(options);
+        setHasStableIds(true);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -43,6 +46,7 @@ public class CityAdapter extends FirestoreRecyclerAdapter<City, CityAdapter.View
     public void setOnBindTotalBars(OnBindTotalBars onBindTotalBars) {
         this.onBindTotalBars = onBindTotalBars;
     }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -77,14 +81,20 @@ public class CityAdapter extends FirestoreRecyclerAdapter<City, CityAdapter.View
         return new CityAdapter.ViewHolder(view);
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onBindViewHolder(@NonNull CityAdapter.ViewHolder viewHolder, int position, @NonNull City city) {
+        if (position >= getItemCount())
+            return;
+
         viewHolder.getCityName().setText(city.getName());
 
-        onBindTotalBars.setTotalBars(viewHolder, city);
+        if (onBindTotalBars != null) {
+            onBindTotalBars.setTotalBars(viewHolder, city);
+        }
 
-        viewHolder.itemView.setOnClickListener(view -> onItemClickListener.onItemClick(city));
+        if (onItemClickListener != null) {
+            viewHolder.itemView.setOnClickListener(view -> onItemClickListener.onItemClick(city));
+        }
     }
 
 

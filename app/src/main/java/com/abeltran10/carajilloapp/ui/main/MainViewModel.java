@@ -67,31 +67,19 @@ public class MainViewModel extends ViewModel {
         return mainGPSResult;
     }
 
-    public Query searchBars(City city, String searchText, List<Bar> barList) {
+    public Query searchBars(City city, String searchText) {
         Query query;
 
-        if (barList != null) {
-            List<String> barIds = new ArrayList<>();
-            query = bd.collection("bars").whereEqualTo("city", city.getId());
-            for(Bar bar : barList) {
-                barIds.add(bar.getId());
-            }
-
-            query = query.whereIn("id", barIds);
-            query.orderBy("name", Query.Direction.ASCENDING);
-
-        } else {
-            if (searchText.isEmpty())
+        if (searchText.isEmpty())
                 query = bd.collection("bars")
                         .whereEqualTo("city", city.getId())
                         .orderBy("name", Query.Direction.ASCENDING);
-            else
+        else
                 query = bd.collection("bars")
                         .whereEqualTo("city", city.getId())
                         .orderBy("name", Query.Direction.ASCENDING)
                         .startAt(searchText.toUpperCase())
                         .endAt(searchText.toUpperCase() + "\uf8ff");
-        }
 
         return query;
     }
