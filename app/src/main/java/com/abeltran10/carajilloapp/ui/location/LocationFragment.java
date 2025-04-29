@@ -85,27 +85,6 @@ public class LocationFragment extends Fragment {
 
         locationAdapter = new LocationAdapter(options, city);
 
-        locationAdapter.setOnItemClickListener((bar, c) -> {
-            if (getContext() != null && getContext().getApplicationContext() != null) {
-                Bundle bundle = new Bundle();
-                bundle.putString("id", bar.getId());
-                bundle.putString("name", bar.getName());
-                bundle.putString("cityId", c.getId());
-                bundle.putString("cityName", c.getName());
-                bundle.putString("address", bar.getAddress());
-                bundle.putDouble("latitude", bar.getLatitude());
-                bundle.putDouble("longitude", bar.getLongitude());
-                bundle.putString("postalCode", bar.getPostalCode());
-                bundle.putFloat("rating", bar.getRating());
-                bundle.putLong("totalVotes", bar.getTotalVotes());
-
-                RatingDialogFragment ratingDialogFragment = RatingDialogFragment.newInstance();
-                ratingDialogFragment.setArguments(bundle);
-
-                ratingDialogFragment.show(requireActivity().getSupportFragmentManager(), "ratingDialog");
-            }
-        });
-
         recyclerView.setAdapter(locationAdapter);
 
         locationAdapter.startListening();

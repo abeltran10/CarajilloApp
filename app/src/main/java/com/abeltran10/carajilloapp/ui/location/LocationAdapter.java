@@ -26,21 +26,11 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 public class LocationAdapter extends FirestoreRecyclerAdapter<Bar, LocationAdapter.ViewHolder> {
 
-    private LocationAdapter.OnItemClickListener onItemClickListener;
-
     private City city;
-
-    public interface OnItemClickListener {
-        void onItemClick(Bar bar, City city);
-    }
 
     public LocationAdapter(@NonNull FirestoreRecyclerOptions<Bar> options, City city) {
         super(options);
         this.city = city;
-    }
-
-    public void setOnItemClickListener(LocationAdapter.OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -48,17 +38,13 @@ public class LocationAdapter extends FirestoreRecyclerAdapter<Bar, LocationAdapt
 
         private final TextView restaurantLocation;
 
-        private final RatingBar rating;
-
         private final ImageButton map;
 
         public ViewHolder(View view) {
             super(view);
-            // Define click listener for the ViewHolder's View
 
             restaurantName = (TextView) view.findViewById(R.id.restaurant_name);
             restaurantLocation = (TextView) view.findViewById(R.id.restaurant_location);
-            rating = (RatingBar) view.findViewById(R.id.ratingBar);
             map = (ImageButton) view.findViewById(R.id.map);
         }
 
@@ -68,10 +54,6 @@ public class LocationAdapter extends FirestoreRecyclerAdapter<Bar, LocationAdapt
 
         public TextView getRestaurantLocation() {
             return restaurantLocation;
-        }
-
-        public RatingBar getRating() {
-            return rating;
         }
 
         public ImageButton getMap() {
@@ -84,7 +66,6 @@ public class LocationAdapter extends FirestoreRecyclerAdapter<Bar, LocationAdapt
         viewHolder.getRestaurantName().setText(bar.getName().toUpperCase());
         String location = city.getName() + " - " + bar.getAddress() + " (" + bar.getPostalCode() + ")";
         viewHolder.getRestaurantLocation().setText(location);
-        viewHolder.getRating().setRating(bar.getRating());
         viewHolder.getMap().setOnClickListener(view -> {
             // URI para Maps
             Uri gmmIntentUri = Uri.parse("geo:0,0" + "?q=Bar "
@@ -104,8 +85,6 @@ public class LocationAdapter extends FirestoreRecyclerAdapter<Bar, LocationAdapt
                 Toast.makeText(context, "Google Maps no està instal·lat", Toast.LENGTH_SHORT).show();
             }
         });
-
-        viewHolder.itemView.setOnClickListener(view -> onItemClickListener.onItemClick(bar, city));
     }
 
     @NonNull
