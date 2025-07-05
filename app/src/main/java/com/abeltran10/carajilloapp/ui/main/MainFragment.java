@@ -2,7 +2,9 @@ package com.abeltran10.carajilloapp.ui.main;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -296,6 +298,24 @@ public class MainFragment extends Fragment {
 
                 ratingDialogFragment.show(requireActivity().getSupportFragmentManager(), "ratingDialog");
             }
+        });
+
+        mainAdapter.setOnBtnShareListener((bar, c) -> {
+            String location = bar.getName() + ", " + bar.getAddress() + " "
+                    + bar.getPostalCode() + ", " + c.getName();
+
+            String message = "Prova els carajillos d'ací! \n" +
+                    "Nom: " + bar.getName() + "\n" +
+                    "Adreça: " + bar.getAddress() + "\n" +
+                    "Població: " + c.getName() + "\n" +
+                    "https://maps.google.com/?q=" + Uri.encode("Bar " + location);
+
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT, message);
+
+            Intent chooser = Intent.createChooser(intent, "Compartir bar amb...");
+            getContext().startActivity(chooser);
         });
 
         recyclerView.setAdapter(mainAdapter);

@@ -1,9 +1,12 @@
 package com.abeltran10.carajilloapp.ui.main;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -19,9 +22,15 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewHolder> {
     private OnItemClickListener onItemClickListener;
 
+    private OnBtnShareListener onBtnShareListener;
+
     private City city;
 
     public interface OnItemClickListener {
+        void onItemClick(Bar bar, City city);
+    }
+
+    public interface OnBtnShareListener {
         void onItemClick(Bar bar, City city);
     }
 
@@ -32,6 +41,10 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    public void setOnBtnShareListener(OnBtnShareListener onBtnShareListener) {
+        this.onBtnShareListener = onBtnShareListener;
     }
 
 
@@ -46,6 +59,8 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
 
         private final RatingBar rating;
 
+        private final ImageView btnShare;
+
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
@@ -53,6 +68,8 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
             restaurantName = (TextView) view.findViewById(R.id.restaurant_name);
             restaurantLocation = (TextView) view.findViewById(R.id.restaurant_location);
             rating = (RatingBar) view.findViewById(R.id.ratingBar);
+            btnShare = (ImageView) view.findViewById(R.id.btnCompartir);
+
         }
 
         public TextView getRestaurantName() {
@@ -65,6 +82,10 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
 
         public RatingBar getRating() {
             return rating;
+        }
+
+        public ImageView getBtnShare() {
+            return btnShare;
         }
     }
 
@@ -85,6 +106,8 @@ public class MainAdapter extends FirestoreRecyclerAdapter<Bar, MainAdapter.ViewH
         String location = city.getName() + " - " + bar.getAddress() + " (" + bar.getPostalCode() + ")";
         viewHolder.getRestaurantLocation().setText(location);
         viewHolder.getRating().setRating(bar.getRating());
+
+        viewHolder.getBtnShare().setOnClickListener(view -> onBtnShareListener.onItemClick(bar, city));
 
         viewHolder.itemView.setOnClickListener(view -> onItemClickListener.onItemClick(bar, city));
     }
