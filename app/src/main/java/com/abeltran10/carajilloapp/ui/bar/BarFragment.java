@@ -158,10 +158,6 @@ public class BarFragment extends Fragment {
                     "Bar: " + success.getName().toUpperCase() + " afegit amb exit.",
                     Toast.LENGTH_LONG).show();
 
-            Bundle bundle = new Bundle();
-            bundle.putString("cityId", city.getId());
-            bundle.putString("cityName", city.getName());
-
             requireActivity().getSupportFragmentManager().popBackStack();
         }
     }
