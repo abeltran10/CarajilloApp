@@ -78,10 +78,12 @@ public class LocationAdapter extends FirestoreRecyclerAdapter<Bar, LocationAdapt
             mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             Context context = viewHolder.itemView.getContext();
-            // Verificamos que Maps esté instalado
-            if (mapIntent.resolveActivity(context.getPackageManager()) != null) {
-                    context.startActivity(mapIntent);
-            } else {
+
+            try {
+                // Intentamos lanzar Google Maps directamente
+                context.startActivity(mapIntent);
+            } catch (android.content.ActivityNotFoundException e) {
+                // Si no está instalado, capturamos el error y mostramos el Toast
                 Toast.makeText(context, "Google Maps no està instal·lat", Toast.LENGTH_SHORT).show();
             }
         });
