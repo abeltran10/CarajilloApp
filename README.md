@@ -20,7 +20,7 @@ I és que com els cigalons de la nostra província, cap, perquè ningú com els 
 
 ## Demo
 
-Demo [Últim llançament](https://github.com/abeltran10/CarajilloApp/releases/tag/v4.1.0.1)
+Demo v4.1.0.2
 
 [CarajilloApp-v4.1.0.webm](https://github.com/user-attachments/assets/b03ef5ed-3540-4255-a336-c64f6a7bc2aa)
 
