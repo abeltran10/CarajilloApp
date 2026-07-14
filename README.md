@@ -5,17 +5,7 @@
 CarajilloApp és una app per Android on els usuaris poden: crear un compte, iniciar sessió, insertar un bar, cercar els bars propers i puntuar el seu carajillo. S'utilitza una bases de dades al nuvol amb Firebase. El target sdk es el 34 Android Upside Down Cake.
 
 ## Llançaments
-- [v4.1.0.1](https://github.com/abeltran10/CarajilloApp/releases/tag/v4.1.0.1)
-- [v4.1.0](https://github.com/abeltran10/CarajilloApp/releases/tag/v4.1.0)
-- [v4.0.0](https://github.com/abeltran10/CarajilloApp/releases/tag/v4.0.0)
-- [v3.0.0](https://github.com/abeltran10/CarajilloApp/releases/tag/v3.0.0)
-- [RC-3.0.0](https://github.com/abeltran10/CarajilloApp/releases/tag/RC-3.0.0) Aquesta es candidata a release
-- [v2.1.0](https://github.com/abeltran10/CarajilloApp/releases/tag/v2.1.0)
-- [v2.0.0](https://github.com/abeltran10/CarajilloApp/releases/tag/v2.0.0)
-- [v1.0.0](https://github.com/abeltran10/CarajilloApp/releases/tag/v1.0.0). Primera versió totalment funcional
-- [v3.0-beta](https://github.com/abeltran10/CarajilloApp/releases/tag/v3.0-beta)
-- [v2.0-beta](https://github.com/abeltran10/CarajilloApp/releases/tag/v2.0-beta)
-- [beta-v1.0](https://github.com/abeltran10/CarajilloApp/releases/tag/beta-v1.0)
+- [v4.1.0.2](https://github.com/abeltran10/CarajilloApp/releases/tag/v4.1.0.2)
 
 ## Què és un carajillo?
 
